@@ -6,6 +6,8 @@ const MusicPlayer = () => {
   const { load, togglePlayPause } = useAudioPlayer();
   const [isPlaying, setIsPlaying] = useState(true);
 
+  console.log(isPlaying);
+
   useEffect(() => {
     try {
       load("./music.mp3", {
@@ -25,7 +27,7 @@ const MusicPlayer = () => {
 
   return (
     <div>
-      <h1>안녕하세요! 🎵</h1>
+      <h1>안녕하세요! 테스트2 🎵</h1>
       <h1 onClick={togglePlayPause}>중지/재생</h1>
     </div>
   );

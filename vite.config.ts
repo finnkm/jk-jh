@@ -1,22 +1,41 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import { execSync } from "child_process";
 import tailwindcss from "@tailwindcss/vite";
+import { VitePWA } from "vite-plugin-pwa";
 
-// Git 커밋 해시 가져오기
-const getGitCommitHash = () => {
-  try {
-    return execSync("git rev-parse HEAD").toString().trim();
-  } catch {
-    return "unknown";
-  }
-};
-
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    VitePWA({
+      registerType: "prompt",
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+        cleanupOutdatedCaches: true,
+        maximumFileSizeToCacheInBytes: 5000000,
+        runtimeCaching: [
+          {
+            urlPattern: /\.mp3$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "audio-cache",
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
+        ],
+      },
+      includeAssets: ["favicon.ico"],
+      manifest: {
+        name: "JK-JH App",
+        short_name: "JK-JH",
+        description: "JK-JH React App with Auto Update",
+        theme_color: "#ffffff",
+        background_color: "#ffffff",
+      },
+    }),
+  ],
   base: "/jk-jh/",
-  define: {
-    __GIT_COMMIT_HASH__: JSON.stringify(getGitCommitHash()),
-  },
 });

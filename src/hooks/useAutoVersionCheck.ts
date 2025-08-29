@@ -1,50 +1,42 @@
 import { useEffect } from "react";
+import { Workbox } from "workbox-window";
 
 export const useAutoVersionCheck = () => {
-  const currentCommitHash = __GIT_COMMIT_HASH__;
-
   useEffect(() => {
-    const checkVersion = async () => {
-      try {
-        // Fetch the current deployed index.html without cache
-        const response = await fetch(window.location.href, {
-          cache: "no-cache",
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0",
-          },
+    if ("serviceWorker" in navigator) {
+      const workbox = new Workbox("/jk-jh/sw.js", { scope: "/jk-jh/" });
+
+      // 새 버전 감지 시 즉시 자동 업데이트
+      workbox.addEventListener("waiting", () => {
+        workbox.messageSkipWaiting();
+      });
+
+      // 새 Service Worker 활성화 시 페이지 리로드
+      workbox.addEventListener("controlling", () => {
+        window.location.reload();
+      });
+
+      // Service Worker 등록 및 업데이트 체크
+      workbox
+        .register()
+        .then((registration) => {
+          if (!registration) return;
+
+          // 페이지 포커스 시 업데이트 체크
+          const handleVisibilityChange = () => {
+            if (!document.hidden) {
+              registration.update();
+            }
+          };
+
+          document.addEventListener("visibilitychange", handleVisibilityChange);
+
+          // 초기 업데이트 체크
+          setTimeout(() => registration.update(), 3000);
+        })
+        .catch((error) => {
+          console.error("Service Worker registration failed:", error);
         });
-
-        const html = await response.text();
-
-        // Extract the hash of the currently deployed JS file from HTML
-        const scriptMatch = html.match(/assets\/index-([^.]+)\.js/);
-        const deployedHash = scriptMatch?.[1];
-
-        // Extract the hash of the currently loaded script tag
-        const loadedScript = document.querySelector('script[src*="assets/index-"]');
-        const loadedHash = loadedScript?.getAttribute("src")?.match(/assets\/index-([^.]+)\.js/)?.[1];
-
-        // If hashes are different, a new version has been deployed
-        if (deployedHash && loadedHash && deployedHash !== loadedHash) {
-          console.log("New version detected. Clearing cache and reloading page...");
-
-          // Clear cache
-          if ("caches" in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
-          }
-
-          // Reload immediately
-          window.location.reload();
-        }
-      } catch (error) {
-        console.log("Version check failed:", error);
-      }
-    };
-
-    // Check version only once when page loads
-    checkVersion();
-  }, [currentCommitHash]);
+    }
+  }, []);
 };
