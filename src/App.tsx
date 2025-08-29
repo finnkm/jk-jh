@@ -2,9 +2,13 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { useAutoVersionCheck } from './hooks/useAutoVersionCheck'
 
 function App() {
   const [count, setCount] = useState(0)
+  
+  // 자동 버전 체크 및 캐시 무효화
+  useAutoVersionCheck();
 
   return (
     <>
