@@ -1,34 +1,44 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import { useEffect, useState } from "react";
 import { useAutoVersionCheck } from "./hooks/useAutoVersionCheck";
+import { AudioPlayerProvider, useAudioPlayer } from "react-use-audio-player";
 
-function App() {
-  const [count, setCount] = useState(0);
+const MusicPlayer = () => {
+  const { load, togglePlayPause } = useAudioPlayer();
+  const [isPlaying, setIsPlaying] = useState(true);
 
+  useEffect(() => {
+    try {
+      load("./music.mp3", {
+        autoplay: true, // 자동 재생 시도
+        loop: true, // 반복 재생
+        onload: () => {
+          setIsPlaying(true);
+        },
+        onstop: () => {
+          setIsPlaying(false);
+        },
+      });
+    } catch (err) {
+      console.error("Error loading music:", err);
+    }
+  }, [load]);
+
+  return (
+    <div>
+      <h1>안녕하세요! 🎵</h1>
+      <h1 onClick={togglePlayPause}>중지/재생</h1>
+    </div>
+  );
+};
+
+const App: React.FC = () => {
   useAutoVersionCheck();
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+    <AudioPlayerProvider>
+      <MusicPlayer />
+    </AudioPlayerProvider>
   );
-}
+};
 
 export default App;
