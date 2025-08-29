@@ -27,8 +27,8 @@ const MusicPlayer = () => {
 
   return (
     <div>
-      <h1>안녕하세요! 테스트2 🎵</h1>
-      <h1 onClick={togglePlayPause}>중지/재생</h1>
+      <h1>안녕하세요! 🎵</h1>
+      <h1 onClick={togglePlayPause}>음악 중지/재생 클릭</h1>
     </div>
   );
 };
