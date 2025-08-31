@@ -7,18 +7,22 @@ export const useAutoPlay = () => {
     const tryAutoPlay = async () => {
       if (audioRef.current) {
         try {
-          // 음소거 상태에서 자동재생 시도 (브라우저 정책 우회)
-          audioRef.current.muted = true;
+          // First attempt: try auto-play without muting
+          audioRef.current.muted = false;
           await audioRef.current.play();
-
-          // 잠시 후 음소거 해제
-          setTimeout(() => {
-            if (audioRef.current) {
-              audioRef.current.muted = false;
-            }
-          }, 1000);
         } catch (error) {
-          console.log("Auto-play failed:", error);
+          console.log("Auto-play failed, trying with muted:", error);
+
+          try {
+            // Fallback: try auto-play with muted state, then immediately unmute
+            audioRef.current.muted = true;
+            await audioRef.current.play();
+
+            // Immediately unmute (user has interacted with the page)
+            audioRef.current.muted = false;
+          } catch (mutedError) {
+            console.log("Muted auto-play also failed:", mutedError);
+          }
         }
       }
     };

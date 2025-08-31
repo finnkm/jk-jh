@@ -3,7 +3,7 @@ import { Workbox } from "workbox-window";
 
 export const useAutoVersionCheck = () => {
   useEffect(() => {
-    // 개발 환경에서는 Service Worker를 비활성화
+    // Disable Service Worker in development environment
     if (import.meta.env.DEV) {
       console.log("Service Worker disabled in development mode");
       return;
@@ -12,23 +12,23 @@ export const useAutoVersionCheck = () => {
     if ("serviceWorker" in navigator) {
       const workbox = new Workbox("/jk-jh/sw.js", { scope: "/jk-jh/" });
 
-      // 새 버전 감지 시 즉시 자동 업데이트
+      // Auto-update immediately when new version is detected
       workbox.addEventListener("waiting", () => {
         workbox.messageSkipWaiting();
       });
 
-      // 새 Service Worker 활성화 시 페이지 리로드
+      // Reload page when new Service Worker becomes active
       workbox.addEventListener("controlling", () => {
         window.location.reload();
       });
 
-      // Service Worker 등록 및 업데이트 체크
+      // Register Service Worker and check for updates
       workbox
         .register()
         .then((registration) => {
           if (!registration) return;
 
-          // 페이지 포커스 시 업데이트 체크
+          // Check for updates when page gains focus
           const handleVisibilityChange = () => {
             if (!document.hidden) {
               registration.update();
@@ -37,7 +37,7 @@ export const useAutoVersionCheck = () => {
 
           document.addEventListener("visibilitychange", handleVisibilityChange);
 
-          // 초기 업데이트 체크
+          // Initial update check
           setTimeout(() => registration.update(), 3000);
         })
         .catch((error) => {
