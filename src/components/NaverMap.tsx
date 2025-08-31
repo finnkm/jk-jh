@@ -3,9 +3,6 @@ import { Button } from "./ui/button";
 import { Drawer, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { toast } from "sonner";
 
-const LATITUDE = 37.515287;
-const LONGITUDE = 127.102981;
-
 export const NaverMap: React.FC = () => {
   const naverMapRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -53,7 +50,10 @@ export const NaverMap: React.FC = () => {
 
   useEffect(() => {
     if (isLoaded && naverMapRef.current && window.naver?.maps) {
-      const location = new window.naver.maps.LatLng(LATITUDE, LONGITUDE);
+      const location = new window.naver.maps.LatLng(
+        parseFloat(import.meta.env.VITE_LATITUDE),
+        parseFloat(import.meta.env.VITE_LONGITUDE)
+      );
       const map = new window.naver.maps.Map(naverMapRef.current, {
         center: location,
         zoom: 17,
