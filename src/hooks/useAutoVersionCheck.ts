@@ -3,6 +3,12 @@ import { Workbox } from "workbox-window";
 
 export const useAutoVersionCheck = () => {
   useEffect(() => {
+    // 개발 환경에서는 Service Worker를 비활성화
+    if (import.meta.env.DEV) {
+      console.log("Service Worker disabled in development mode");
+      return;
+    }
+
     if ("serviceWorker" in navigator) {
       const workbox = new Workbox("/jk-jh/sw.js", { scope: "/jk-jh/" });
 
