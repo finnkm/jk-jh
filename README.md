@@ -144,3 +144,14 @@ The project is configured for GitHub Pages deployment:
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## 👨‍💻 Author
+
+**finn.kim**
+
+- Email: [thefinnkim@gmail.com](mailto:thefinnkim@gmail.com)
+- GitHub: [@finnkm](https://github.com/finnkm)
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
