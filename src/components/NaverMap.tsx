@@ -10,16 +10,14 @@ export const NaverMap: React.FC = () => {
   useEffect(() => {
     const loadNaverMapScript = () => {
       return new Promise<void>((resolve, reject) => {
-        // 이미 로드되었다면 바로 resolve
         if (window.naver?.maps) {
           resolve();
           return;
         }
 
         const clientId = import.meta.env.VITE_NAVER_MAP_CLIENT_ID;
-
         if (!clientId) {
-          reject(new Error("VITE_NAVER_MAP_CLIENT_ID가 환경변수에 설정되지 않았습니다."));
+          reject(new Error("VITE_NAVER_MAP_CLIENT_ID not found in environment variables"));
           return;
         }
 
@@ -27,19 +25,15 @@ export const NaverMap: React.FC = () => {
         script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}`;
         script.async = true;
         script.onload = () => resolve();
-        script.onerror = () => reject(new Error("네이버 지도 스크립트 로드 실패"));
+        script.onerror = () => reject(new Error("Failed to load Naver Map script"));
 
         document.head.appendChild(script);
       });
     };
 
     loadNaverMapScript()
-      .then(() => {
-        setIsLoaded(true);
-      })
-      .catch((error) => {
-        console.error("네이버 지도 로드 에러:", error);
-      });
+      .then(() => setIsLoaded(true))
+      .catch((error) => console.error("Naver Map load error:", error));
   }, []);
 
   useEffect(() => {
