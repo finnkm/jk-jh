@@ -6,8 +6,6 @@ import { toast } from "sonner";
 const LATITUDE = 37.515287;
 const LONGITUDE = 127.102981;
 
-const ADDRESS = "서울 송파구 올림픽로35다길 42";
-
 export const NaverMap: React.FC = () => {
   const naverMapRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -15,11 +13,12 @@ export const NaverMap: React.FC = () => {
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(ADDRESS);
-      toast("주소 복사가 완료되었어요.");
+      await navigator.clipboard.writeText(import.meta.env.VITE_ADDRESS);
+      toast.success("주소 복사가 완료되었어요.");
       setIsDrawerOpen(false);
     } catch (err) {
       console.error("Failed to copy: ", err);
+      toast.error("주소 복사에 실패했어요. 다시 시도해주세요.");
     }
   };
 
@@ -69,10 +68,10 @@ export const NaverMap: React.FC = () => {
   return (
     <div className="w-full flex flex-col items-center gap-2">
       <div ref={naverMapRef} className="w-full h-80" />
+      <Button variant="outline" className="w-full" onClick={() => setIsDrawerOpen(true)}>
+        네비게이션 연결
+      </Button>
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-        <Button variant="outline" className="w-full" onClick={() => setIsDrawerOpen(true)}>
-          네비게이션 연결
-        </Button>
         <DrawerContent>
           <div className="mx-auto w-full max-w-sm gap-4">
             <DrawerHeader>
