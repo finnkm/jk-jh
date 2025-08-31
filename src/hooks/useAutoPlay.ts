@@ -14,12 +14,25 @@ export const useAutoPlay = () => {
           console.log("Auto-play failed, trying with muted:", error);
 
           try {
-            // Fallback: try auto-play with muted state, then immediately unmute
+            // Fallback: try auto-play with muted state
             audioRef.current.muted = true;
             await audioRef.current.play();
 
-            // Immediately unmute (user has interacted with the page)
-            audioRef.current.muted = false;
+            // Wait for user interaction to unmute
+            const handleUserInteraction = () => {
+              if (audioRef.current) {
+                audioRef.current.muted = false;
+                // Remove event listeners after first interaction
+                document.removeEventListener("click", handleUserInteraction);
+                document.removeEventListener("touchstart", handleUserInteraction);
+                document.removeEventListener("keydown", handleUserInteraction);
+              }
+            };
+
+            // Add event listeners for user interactions
+            document.addEventListener("click", handleUserInteraction, { once: true });
+            document.addEventListener("touchstart", handleUserInteraction, { once: true });
+            document.addEventListener("keydown", handleUserInteraction, { once: true });
           } catch (mutedError) {
             console.log("Muted auto-play also failed:", mutedError);
           }
