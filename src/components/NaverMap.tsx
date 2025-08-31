@@ -50,5 +50,5 @@ export const NaverMap: React.FC = () => {
     }
   }, [isLoaded]);
 
-  return <div ref={naverMapRef} className="w-96 h-80" />;
+  return <div ref={naverMapRef} className="w-full h-80" />;
 };
