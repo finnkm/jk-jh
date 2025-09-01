@@ -38,6 +38,17 @@ export const NaverMap: React.FC = () => {
       toast.error(error instanceof Error ? error.message : "티맵 실행에 실패했습니다.");
     }
   };
+
+  const handleKakaoMapClick = () => {
+    setIsDrawerOpen(false);
+    openKakaoNavi();
+  };
+
+  const handleNaverMapClick = () => {
+    setIsDrawerOpen(false);
+    openNaverMap();
+  };
+
   useEffect(() => {
     const loadNaverMapScript = () => {
       return new Promise<void>((resolve, reject) => {
@@ -109,7 +120,7 @@ export const NaverMap: React.FC = () => {
               <Button
                 variant="ghost"
                 className="w-full flex items-center justify-center gap-2"
-                onClick={() => openKakaoNavi()}
+                onClick={handleKakaoMapClick}
               >
                 <img src={kakaoIcon} alt="카카오맵" className="w-6 h-6" />
                 카카오네비 열기
@@ -127,7 +138,7 @@ export const NaverMap: React.FC = () => {
               <Button
                 variant="ghost"
                 className="w-full flex items-center justify-center gap-2"
-                onClick={() => openNaverMap()}
+                onClick={handleNaverMapClick}
               >
                 <img src={naverIcon} alt="네이버맵" className="w-6 h-6" />
                 네이버네비 열기
