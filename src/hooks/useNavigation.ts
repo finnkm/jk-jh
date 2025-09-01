@@ -5,14 +5,21 @@ export type NavigationType = "kakao" | "tmap" | "naver";
 interface NavigationOptions {
   latitude: number;
   longitude: number;
-  address?: string;
-  name?: string;
+  name: string;
 }
 
 export const useNavigation = (defaultOptions: NavigationOptions) => {
   const openNavigation = useCallback(
     (type: NavigationType, options?: Partial<NavigationOptions>) => {
-      const { latitude, longitude, address, name } = { ...defaultOptions, ...options };
+      const { latitude, longitude, name } = { ...defaultOptions, ...options };
+
+      // 모바일 디바이스 감지
+      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+      // 티맵은 모바일에서만 사용 가능
+      if (type === "tmap" && !isMobile) {
+        throw new Error("티맵은 모바일 환경에서만 사용할 수 있습니다.");
+      }
 
       let url = "";
 
@@ -24,12 +31,12 @@ export const useNavigation = (defaultOptions: NavigationOptions) => {
 
         case "tmap":
           // 티맵 - 현재 위치에서 목적지로의 경로 안내
-          url = `tmap://route?goalx=${longitude}&goaly=${latitude}&goalname=${encodeURIComponent(name || address || "목적지")}`;
+          url = `tmap://route?goalx=${longitude}&goaly=${latitude}&goalname=${encodeURIComponent(name)}`;
           break;
 
         case "naver":
           // 네이버 지도 - 현재 위치에서 목적지로의 도보 경로 안내
-          url = `nmap://route/public?dlat=${latitude}&dlng=${longitude}&dname=${encodeURIComponent(name || address || "목적지")}&appname=com.example.myapp`;
+          url = `nmap://route/public?dlat=${latitude}&dlng=${longitude}&dname=${encodeURIComponent(name)}&appname=com.example.myapp`;
           break;
 
         default:
@@ -48,13 +55,13 @@ export const useNavigation = (defaultOptions: NavigationOptions) => {
 
         switch (type) {
           case "kakao":
-            fallbackUrl = `https://map.kakao.com/link/to/${encodeURIComponent(name || address || "목적지")},${latitude},${longitude}`;
+            fallbackUrl = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${latitude},${longitude}`;
             break;
           case "tmap":
-            fallbackUrl = `https://tmap.life/route?goalx=${longitude}&goaly=${latitude}&goalname=${encodeURIComponent(name || address || "목적지")}`;
+            fallbackUrl = `https://tmap.life/route?goalx=${longitude}&goaly=${latitude}&goalname=${encodeURIComponent(name)}`;
             break;
           case "naver":
-            fallbackUrl = `https://map.naver.com/v5/directions/-/-/${longitude},${latitude},,${encodeURIComponent(name || address || "목적지")}/`;
+            fallbackUrl = `http://map.naver.com/index.nhn?menu=route&elat=${latitude}&elng=${longitude}&eText=${encodeURIComponent(name)}`;
             break;
         }
 
@@ -62,9 +69,6 @@ export const useNavigation = (defaultOptions: NavigationOptions) => {
           window.open(fallbackUrl, "_blank");
         }
       };
-
-      // 모바일 디바이스 감지
-      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
       if (isMobile && (type === "kakao" || type === "tmap" || type === "naver")) {
         // 모바일에서는 앱 열기를 먼저 시도

@@ -3,15 +3,19 @@ import { Button } from "./ui/button";
 import { Drawer, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { toast } from "sonner";
 import { useNavigation } from "@/hooks/useNavigation";
+import { Copy } from "lucide-react";
+import kakaoIcon from "@/assets/kakaomap.png";
+import tmapIcon from "@/assets/tmap.png";
+import naverIcon from "@/assets/navermap.png";
 
 export const NaverMap: React.FC = () => {
   const naverMapRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   const { openKakaoNavi, openTMapNavi, openNaverMap } = useNavigation({
     latitude: parseFloat(import.meta.env.VITE_LATITUDE),
     longitude: parseFloat(import.meta.env.VITE_LONGITUDE),
-    address: import.meta.env.VITE_ADDRESS,
     name: import.meta.env.VITE_LOCATION_NAME,
   });
 
@@ -26,21 +30,14 @@ export const NaverMap: React.FC = () => {
     }
   };
 
-  const handleKakaoNavi = () => {
-    openKakaoNavi();
-    setIsDrawerOpen(false);
+  const handleTMapClick = () => {
+    try {
+      openTMapNavi();
+    } catch (error) {
+      setIsDrawerOpen(false);
+      toast.error(error instanceof Error ? error.message : "티맵 실행에 실패했습니다.");
+    }
   };
-
-  const handleTMapNavi = () => {
-    openTMapNavi();
-    setIsDrawerOpen(false);
-  };
-
-  const handleNaverMap = () => {
-    openNaverMap();
-    setIsDrawerOpen(false);
-  };
-
   useEffect(() => {
     const loadNaverMapScript = () => {
       return new Promise<void>((resolve, reject) => {
@@ -100,19 +97,39 @@ export const NaverMap: React.FC = () => {
               <DrawerTitle>원하시는 항목을 선택하세요.</DrawerTitle>
             </DrawerHeader>
             <div className="flex flex-col items-center justify-center gap-2">
-              <Button variant="ghost" className="w-full" onClick={copyToClipboard}>
+              <Button
+                variant="ghost"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={copyToClipboard}
+              >
+                <Copy />
                 주소복사
               </Button>
               <div className="h-px w-full bg-gray-300" />
-              <Button variant="ghost" className="w-full" onClick={handleKakaoNavi}>
+              <Button
+                variant="ghost"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => openKakaoNavi()}
+              >
+                <img src={kakaoIcon} alt="카카오맵" className="w-6 h-6" />
                 카카오네비 열기
               </Button>
               <div className="h-px w-full bg-gray-300" />
-              <Button variant="ghost" className="w-full" onClick={handleTMapNavi}>
+              <Button
+                variant="ghost"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={handleTMapClick}
+              >
+                <img src={tmapIcon} alt="티맵" className="w-6 h-6" />
                 티맵네비 열기
               </Button>
               <div className="h-px w-full bg-gray-300" />
-              <Button variant="ghost" className="w-full" onClick={handleNaverMap}>
+              <Button
+                variant="ghost"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => openNaverMap()}
+              >
+                <img src={naverIcon} alt="네이버맵" className="w-6 h-6" />
                 네이버네비 열기
               </Button>
             </div>
