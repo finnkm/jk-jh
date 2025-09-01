@@ -1,7 +1,5 @@
 # Wedding Website - JK & JH
 
-A beautiful wedding invitation website built with React, TypeScript, and Vite. Features include interactive maps with navigation integ# Wedding Website - JK & JH
-
 A beautiful wedding invitation website built with React, TypeScript, and Vite. Features interactive maps with multi-platform navigation integration, background music, and modern UI components.
 
 ## ✨ Features
@@ -176,127 +174,7 @@ Configured for GitHub Pages:
 2. Create feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit changes (`git commit -m 'Add amazing feature'`)
 4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
-## ✨ Key Features
-
-- **Interactive Naver Map**: Wedding venue location with interactive marker
-- **Multi-Platform Navigation**: Integration with Kakao Map, T Map, and Naver Map
-  - Mobile app deep linking with web fallback
-  - Smart mobile device detection
-- **Background Music Player**: Auto-play wedding music with controls
-- **Address Copy Function**: One-click address copying to clipboard
-- **Modern UI Components**: Built with shadcn/ui and Radix UI primitives
-- **Toast Notifications**: User feedback with Sonner toast library
-- **Responsive Design**: Optimized for both desktop and mobile
-- **PWA Support**: Progressive Web App with offline capabilities
-
-## 👨‍💻 Author
-
-**finn.kim**
-
-- Email: [thefinnkim@gmail.com](mailto:thefinnkim@gmail.com)
-- GitHub: [@finnkm](https://github.com/finnkm)
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js (version 16 or higher)
-- npm or yarn package manager
-
-### Installation & Setup
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/finnkm/jk-jh.git
-   cd jk-jh
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Environment Configuration**
-
-   Copy the example environment file and configure it:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Edit the `.env` file with your actual values. See the [Environment Variables](#environment-variables) section for detailed descriptions of each variable.
-
-4. **Get Naver Map API Key**
-   - Visit [Naver Cloud Platform](https://www.ncloud.com/)
-   - Create an account and enable Maps API
-   - Generate a Client ID for Web Dynamic Map
-   - Replace `your_actual_naver_map_client_id` with your key
-
-### 🏃‍♂️ Running the Project
-
-**Development Server**
-
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:5173`
-
-**Build for Production**
-
-```bash
-npm run build
-```
-
-**Preview Production Build**
-
-```bash
-npm run preview
-```
-
-**Deploy to GitHub Pages**
-
-```bash
-npm run deploy
-```
-
-## 📁 Project Structure
-
-```
-src/
-├── components/
-│   ├── MusicPlayer.tsx         # Background music player with controls
-│   ├── NaverMap.tsx           # Interactive map with navigation drawer
-│   ├── sections/
-│   │   └── LocationSection.tsx # Location information section
-│   └── ui/
-│       ├── button.tsx         # shadcn/ui button component
-│       ├── calendar.tsx       # shadcn/ui calendar component
-│       └── drawer.tsx         # shadcn/ui drawer component
-├── hooks/
-│   ├── useAutoPlay.ts         # Music auto-play functionality
-│   ├── useAutoVersionCheck.ts # PWA auto-update logic
-│   └── useNavigation.ts       # Custom navigation hook for maps
-├── assets/
-│   ├── kakaomap.png          # Kakao Map icon
-│   ├── tmap.png              # T Map icon
-│   └── navermap.png          # Naver Map icon
-├── lib/
-│   └── utils.ts              # Utility functions
-└── App.tsx                   # Main application component
-```
-
-## 🔧 Configuration
-
-### Environment Variables
+5. Open a Pull Request
 
 All environment variables must be prefixed with `VITE_` to be accessible in the frontend:
 
