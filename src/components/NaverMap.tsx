@@ -1,12 +1,12 @@
-import React, { useRef, useEffect, useState } from "react";
-import { Button } from "./ui/button";
-import { Drawer, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import { toast } from "sonner";
-import { useNavigation } from "@/hooks/useNavigation";
+import React, { useEffect, useRef, useState } from "react";
 import { Copy } from "lucide-react";
+import { toast } from "sonner";
 import kakaoIcon from "@/assets/kakaomap.png";
-import tmapIcon from "@/assets/tmap.png";
 import naverIcon from "@/assets/navermap.png";
+import tmapIcon from "@/assets/tmap.png";
+import { Drawer, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { useNavigation } from "@/hooks/useNavigation";
+import { Button } from "./ui/button";
 
 export const NaverMap: React.FC = () => {
   const naverMapRef = useRef<HTMLDivElement>(null);
@@ -87,6 +87,9 @@ export const NaverMap: React.FC = () => {
       const map = new window.naver.maps.Map(naverMapRef.current, {
         center: location,
         zoom: 17,
+        keyboardShortcuts: false,
+        disableDoubleTapZoom: true,
+        disableDoubleClickZoom: true,
       });
       new window.naver.maps.Marker({
         position: location,
@@ -105,7 +108,7 @@ export const NaverMap: React.FC = () => {
         <DrawerContent>
           <div className="mx-auto w-full max-w-sm gap-4">
             <DrawerHeader>
-              <DrawerTitle>원하시는 항목을 선택하세요.</DrawerTitle>
+              <DrawerTitle className="font-default-bold">원하시는 항목을 선택하세요.</DrawerTitle>
             </DrawerHeader>
             <div className="flex flex-col items-center justify-center gap-2">
               <Button
@@ -122,7 +125,7 @@ export const NaverMap: React.FC = () => {
                 className="w-full flex items-center justify-center gap-2"
                 onClick={handleKakaoMapClick}
               >
-                <img src={kakaoIcon} alt="카카오맵" className="w-6 h-6" />
+                <img src={kakaoIcon} alt="kakao" className="w-6 h-6" />
                 카카오네비 열기
               </Button>
               <div className="h-px w-full bg-gray-300" />
@@ -131,7 +134,7 @@ export const NaverMap: React.FC = () => {
                 className="w-full flex items-center justify-center gap-2"
                 onClick={handleTMapClick}
               >
-                <img src={tmapIcon} alt="티맵" className="w-6 h-6" />
+                <img src={tmapIcon} alt="tmap" className="w-6 h-6" />
                 티맵네비 열기
               </Button>
               <div className="h-px w-full bg-gray-300" />
@@ -140,7 +143,7 @@ export const NaverMap: React.FC = () => {
                 className="w-full flex items-center justify-center gap-2"
                 onClick={handleNaverMapClick}
               >
-                <img src={naverIcon} alt="네이버맵" className="w-6 h-6" />
+                <img src={naverIcon} alt="naver" className="w-6 h-6" />
                 네이버네비 열기
               </Button>
             </div>

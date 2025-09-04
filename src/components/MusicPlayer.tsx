@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Volume2, VolumeOff } from "lucide-react";
 import { AudioPlayerProvider, useAudioPlayer } from "react-use-audio-player";
 import { Button } from "@/components/ui/button";
-import { Volume2, VolumeOff } from "lucide-react";
 
 const MusicPlayerInternal: React.FC = () => {
   const { load, togglePlayPause } = useAudioPlayer();
@@ -27,11 +27,9 @@ const MusicPlayerInternal: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex justify-end">
-      <Button variant="ghost" size="icon" onClick={handleToggle}>
-        {isPlaying ? <Volume2 /> : <VolumeOff />}
-      </Button>
-    </div>
+    <Button variant="ghost" size="icon" onClick={handleToggle}>
+      {isPlaying ? <Volume2 /> : <VolumeOff />}
+    </Button>
   );
 };
 
