@@ -10,7 +10,7 @@ const App: React.FC = () => {
   return (
     <>
       <div className="w-screen h-screen flex justify-center">
-        <div className="h-full w-full flex flex-col p-4 gap-4 relative">
+        <div className="h-full w-full flex flex-col p-4 gap-4 relative overflow-auto">
           <HeaderSection />
           <LocationSection />
           <FooterSection />
