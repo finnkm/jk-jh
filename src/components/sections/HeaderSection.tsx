@@ -6,9 +6,9 @@ export const HeaderSection: React.FC = () => {
   return (
     <header className="w-full flex items-center justify-between gap-4 sticky top-0 bottom-0 z-50">
       <div className="flex items-center gap-1 font-default-bold">
-        김재권
+        {import.meta.env.VITE_GROOM_NAME}
         <HeartHandshake />
-        김지현
+        {import.meta.env.VITE_BRIDE_NAME}
       </div>
       <MusicPlayer />
     </header>

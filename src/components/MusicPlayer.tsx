@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Howl } from "howler";
 import { Volume2, VolumeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import musicFile from "/music.wav";
+import musicFile from "/untitled.wav";
 
 export const MusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
