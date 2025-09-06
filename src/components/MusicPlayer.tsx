@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Howl } from "howler";
 import { Volume2, VolumeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,13 @@ import musicFile from "/untitled.wav";
 export const MusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const soundRef = useRef<Howl | null>(null);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
+    if (isInitializedRef.current || soundRef.current) {
+      return;
+    }
+
     const sound = new Howl({
       src: [musicFile],
       loop: true,
@@ -16,7 +21,11 @@ export const MusicPlayer: React.FC = () => {
       preload: true,
       html5: true,
       onload: () => {
-        sound.play();
+        setTimeout(() => {
+          if (soundRef.current && !soundRef.current.playing()) {
+            soundRef.current.play();
+          }
+        }, 100);
       },
       onplay: () => {
         setIsPlaying(true);
@@ -24,21 +33,33 @@ export const MusicPlayer: React.FC = () => {
       onpause: () => {
         setIsPlaying(false);
       },
-      onplayerror: () => {
+      onstop: () => {
+        setIsPlaying(false);
+      },
+      onplayerror: (_id, error) => {
+        console.warn("Music player error:", error);
         sound.once("unlock", () => {
-          sound.play();
+          if (soundRef.current && !soundRef.current.playing()) {
+            soundRef.current.play();
+          }
         });
       },
     });
 
     soundRef.current = sound;
+    isInitializedRef.current = true;
 
     return () => {
-      sound.unload();
+      if (sound) {
+        sound.stop();
+        sound.unload();
+      }
+      soundRef.current = null;
+      isInitializedRef.current = false;
     };
   }, []);
 
-  const handleToggle = () => {
+  const handleToggle = useCallback(() => {
     const sound = soundRef.current;
     if (!sound) return;
 
@@ -47,7 +68,7 @@ export const MusicPlayer: React.FC = () => {
     } else {
       sound.play();
     }
-  };
+  }, []);
 
   return (
     <Button variant="ghost" size="icon" onClick={handleToggle}>
