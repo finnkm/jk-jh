@@ -12,7 +12,7 @@ export const CalendarSection: React.FC = () => {
         <p className="font-default-bold text-xl ">2026. 4. 18</p>
         <p className="text-xs">토요일 오후 4시</p>
       </div>
-      <div className="h-px w-3/4 bg-gray-300" />
+      <div className="h-px w-4/5 bg-gray-300" />
       <style>{`
         .calendar-custom .rdp-root {
           --rdp-accent-color: hsl(0 0% 9%);
@@ -51,7 +51,7 @@ export const CalendarSection: React.FC = () => {
           selected: "bg-primary text-primary-foreground hover:bg-primary focus:bg-primary",
         }}
       />
-      <div className="h-px w-3/4 bg-gray-300" />
+      <div className="h-px w-4/5 bg-gray-300" />
       <p>
         재권 ❤️ 지현의 결혼식이 {Math.ceil((fixedDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))}일 남았습니다.
       </p>
