@@ -1,33 +1,49 @@
 import React from "react";
-import { Calendar } from "../ui/calendar";
+import { ko } from "date-fns/locale";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
 
 export const CalendarSection: React.FC = () => {
   const fixedDate = new Date(import.meta.env.VITE_WEDDING_DATE);
 
   return (
     <div className="w-full flex items-center justify-center">
-      <Calendar
+      <style>{`
+        .calendar-custom .rdp-root {
+          --rdp-accent-color: hsl(0 0% 9%);
+          --rdp-accent-background-color: hsl(0 0% 9%);
+          --rdp-day-width: 40px;
+          --rdp-day-height: 40px;
+          --rdp-day_button-width: 40px;
+          --rdp-day_button-height: 40px;
+          --rdp-day_button-border-radius: 50%;
+          --rdp-nav-height: 0px;
+        }
+        .calendar-custom .rdp-weekday:first-child {
+          color: rgb(239 68 68);
+        }
+      `}</style>
+      <DayPicker
         mode="single"
-        defaultMonth={fixedDate}
         selected={fixedDate}
         onSelect={() => {}}
+        defaultMonth={fixedDate}
+        locale={ko}
         showOutsideDays={false}
-        className="w-full h-fit max-w-sm p-0 [&_button]:hover:!bg-transparent [&_button]:focus:!bg-transparent [&_button[data-selected-single='true']]:!bg-primary [&_button[data-selected-single='true']]:!text-primary-foreground [&_button[data-selected-single='true']]:hover:!bg-primary [&_button[data-selected-single='true']]:focus:!bg-primary"
+        className="calendar-custom"
         classNames={{
           nav: "hidden",
           month_caption: "hidden",
-          weekdays: "flex gap-0",
-          weekday: "[&:first-child]:text-red-500 flex-1 text-center",
+          button_previous: "hidden",
+          button_next: "hidden",
+          day_button: "cursor-default hover:bg-transparent focus:bg-transparent focus:outline-none",
         }}
         modifiers={{
           sunday: (date) => date.getDay() === 0,
-          notSelected: (date) => date.getTime() !== fixedDate.getTime(),
         }}
         modifiersClassNames={{
-          sunday:
-            "text-red-500 hover:!text-red-500 focus:!text-red-500 [&>button]:hover:!text-red-500 [&>button]:focus:!text-red-500", // 일요일 텍스트 호버 시에도 빨간색 유지
-          notSelected:
-            "hover:!bg-transparent focus:!bg-transparent focus:!ring-0 focus:!border-0 focus:!outline-none [&>button]:hover:!bg-transparent [&>button]:focus:!bg-transparent [&>button]:focus:!ring-0 [&>button]:focus:!border-0 [&>button]:focus:!outline-none",
+          sunday: "text-red-500",
+          selected: "bg-primary text-primary-foreground hover:bg-primary focus:bg-primary",
         }}
       />
     </div>
