@@ -5,14 +5,14 @@ export const CalendarSection: React.FC = () => {
   const fixedDate = new Date(import.meta.env.VITE_WEDDING_DATE);
 
   return (
-    <div className="w-full flex flex-col items-center justify-center">
+    <div className="w-full flex items-center justify-center">
       <Calendar
         mode="single"
         defaultMonth={fixedDate}
         selected={fixedDate}
         onSelect={() => {}}
         showOutsideDays={false}
-        className="w-full max-w-sm [&_button]:hover:!bg-transparent [&_button]:focus:!bg-transparent [&_button[data-selected-single='true']]:!bg-primary [&_button[data-selected-single='true']]:!text-primary-foreground [&_button[data-selected-single='true']]:hover:!bg-primary [&_button[data-selected-single='true']]:focus:!bg-primary"
+        className="w-full h-fit max-w-sm p-0 [&_button]:hover:!bg-transparent [&_button]:focus:!bg-transparent [&_button[data-selected-single='true']]:!bg-primary [&_button[data-selected-single='true']]:!text-primary-foreground [&_button[data-selected-single='true']]:hover:!bg-primary [&_button[data-selected-single='true']]:focus:!bg-primary"
         classNames={{
           nav: "hidden",
           month_caption: "hidden",
