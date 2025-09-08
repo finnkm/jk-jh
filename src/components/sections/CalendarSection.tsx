@@ -7,7 +7,11 @@ export const CalendarSection: React.FC = () => {
   const fixedDate = new Date(import.meta.env.VITE_WEDDING_DATE);
 
   return (
-    <div className="w-full flex items-center justify-center">
+    <div className="w-full flex items-center justify-center flex-col gap-4">
+      <div className="flex flex-col items-center gap-2">
+        <p className="font-default-bold text-xl ">2026. 4. 18</p>
+        <p className="text-xs">토요일 오후 4시</p>
+      </div>
       <style>{`
         .calendar-custom .rdp-root {
           --rdp-accent-color: hsl(0 0% 9%);
