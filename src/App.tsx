@@ -10,13 +10,13 @@ const App: React.FC = () => {
 
   return (
     <>
-      <div className="w-screen h-screen flex justify-center">
-        <div className="h-full w-full flex flex-col p-4 gap-4 relative max-w-xl overflow-y-auto">
-          <HeaderSection />
+      <div className="relative flex min-h-svh flex-col">
+        <HeaderSection />
+        <main className="flex flex-1 flex-col px-4 pb-4 gap-4">
           <CalendarSection />
           <LocationSection />
           <FooterSection />
-        </div>
+        </main>
       </div>
       <Toaster position="top-center" />
     </>
