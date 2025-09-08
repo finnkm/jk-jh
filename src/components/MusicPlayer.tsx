@@ -17,7 +17,7 @@ export const MusicPlayer: React.FC = () => {
     const sound = new Howl({
       src: [musicFile],
       loop: true,
-      volume: 1,
+      volume: 0.3,
       preload: true,
       html5: true,
       onload: () => {
