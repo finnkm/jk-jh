@@ -3,6 +3,7 @@ import { differenceInDays } from "date-fns";
 import { ko } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { CountUp } from "../ui/countUp";
 
 const FIXED_DATE = new Date(import.meta.env.VITE_WEDDING_DATE);
 const DAYS_LEFT = differenceInDays(FIXED_DATE, new Date());
@@ -54,7 +55,9 @@ export const CalendarSection: React.FC = () => {
         }}
       />
       <div className="h-px w-4/5 bg-gray-300" />
-      <p>재권 ❤️ 지현의 결혼식이 {DAYS_LEFT}일 남았습니다.</p>
+      <p>
+        재권 ❤️ 지현의 결혼식이 <CountUp from={0} to={DAYS_LEFT} />일 남았습니다.
+      </p>
     </div>
   );
 };
