@@ -37,10 +37,10 @@ export const MessageSection: React.FC = () => {
     try {
       await send({ content: messagePayload });
     } catch (error) {
-      toast("메시지 전송에 실패했습니다. 잠시 후 다시 시도해주세요.", { position: "bottom-center" });
+      toast.error("메시지 전송에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
 
-    toast("축하 메시지가 성공적으로 전송되었습니다!", { position: "bottom-center" });
+    toast("축하 메시지가 성공적으로 전송되었습니다!");
 
     setPayload({ name: "", content: "" });
     setLoading(false);

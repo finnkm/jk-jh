@@ -20,7 +20,7 @@ const App: React.FC = () => {
           <FooterSection />
         </main>
       </div>
-      <Toaster position="top-center" />
+      <Toaster position="bottom-center" />
     </>
   );
 };
