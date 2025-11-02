@@ -3,6 +3,7 @@ import { CalendarSection } from "./components/sections/CalendarSection";
 import { FooterSection } from "./components/sections/FooterSection";
 import { HeaderSection } from "./components/sections/HeaderSection";
 import { LocationSection } from "./components/sections/LocationSection";
+import { MessageSection } from "./components/sections/MessageSection";
 import { useAutoVersionCheck } from "./hooks/useAutoVersionCheck";
 
 const App: React.FC = () => {
@@ -15,6 +16,7 @@ const App: React.FC = () => {
         <main className="flex flex-1 flex-col px-4 pb-4 gap-4">
           <CalendarSection />
           <LocationSection />
+          <MessageSection />
           <FooterSection />
         </main>
       </div>

@@ -1,5 +1,4 @@
 import * as React from "react";
-import { ko } from "date-fns/locale";
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -21,7 +20,6 @@ function Calendar({
 
   return (
     <DayPicker
-      locale={ko}
       showOutsideDays={showOutsideDays}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
@@ -31,7 +29,7 @@ function Calendar({
       )}
       captionLayout={captionLayout}
       formatters={{
-        formatMonthDropdown: (date) => date.toLocaleString("ko", { month: "short" }),
+        formatMonthDropdown: (date) => date.toLocaleString("default", { month: "short" }),
         ...formatters,
       }}
       classNames={{
@@ -79,7 +77,10 @@ function Calendar({
         week_number_header: cn("select-none w-(--cell-size)", defaultClassNames.week_number_header),
         week_number: cn("text-[0.8rem] select-none text-muted-foreground", defaultClassNames.week_number),
         day: cn(
-          "relative w-full h-full p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none",
+          "relative w-full h-full p-0 text-center [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none",
+          props.showWeekNumber
+            ? "[&:nth-child(2)[data-selected=true]_button]:rounded-l-md"
+            : "[&:first-child[data-selected=true]_button]:rounded-l-md",
           defaultClassNames.day
         ),
         range_start: cn("rounded-l-md bg-accent", defaultClassNames.range_start),
