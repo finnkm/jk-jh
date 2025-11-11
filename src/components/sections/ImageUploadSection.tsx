@@ -14,6 +14,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { usefirebaseStorage } from "@/hooks/usefirebaseStorage";
+import { logAnalyticsEvent } from "@/lib/firebase";
 
 export const ImageUploadSection: React.FC = () => {
   const [isUploadingState, setIsUploadingState] = useState(false);
@@ -68,6 +69,12 @@ export const ImageUploadSection: React.FC = () => {
           })
         );
         toast.success("모든 사진이 성공적으로 업로드되었어요!");
+        
+        // Analytics 이벤트 로깅
+        logAnalyticsEvent("image_upload", {
+          file_count: imageFiles.length,
+          total_size_mb: parseFloat(totalMB),
+        });
       } catch (error) {
         console.error("Upload error:", error);
         toast.error("사진 업로드 중 오류가 발생했어요. 다시 시도해주세요.");

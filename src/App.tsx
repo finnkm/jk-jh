@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { CalendarSection } from "./components/sections/CalendarSection";
 import { FooterSection } from "./components/sections/FooterSection";
@@ -6,9 +7,19 @@ import { ImageUploadSection } from "./components/sections/ImageUploadSection";
 import { LocationSection } from "./components/sections/LocationSection";
 import { MessageSection } from "./components/sections/MessageSection";
 import { useAutoVersionCheck } from "./hooks/useAutoVersionCheck";
+import { logAnalyticsEvent } from "./lib/firebase";
 
 const App: React.FC = () => {
   useAutoVersionCheck();
+
+  // 페이지 방문 트래킹
+  useEffect(() => {
+    logAnalyticsEvent("page_view", {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname,
+    });
+  }, []);
 
   return (
     <>
