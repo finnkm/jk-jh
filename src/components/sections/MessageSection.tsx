@@ -64,7 +64,7 @@ export const MessageSection: React.FC = () => {
                   <Input
                     id="name"
                     type="text"
-                    placeholder="이름을 입력하세요"
+                    placeholder="이름을 입력하세요."
                     required
                     maxLength={20}
                     value={payload.name}
@@ -79,7 +79,7 @@ export const MessageSection: React.FC = () => {
                 ) : (
                   <Textarea
                     id="message"
-                    placeholder="메시지를 입력하세요"
+                    placeholder="메시지를 입력하세요."
                     required
                     maxLength={200}
                     value={payload.content}
@@ -96,7 +96,7 @@ export const MessageSection: React.FC = () => {
         <CardFooter className="flex-col gap-2">
           <Button type="submit" className="w-full" disabled={disabled} onClick={handleSubmit}>
             {loading && <Spinner />}
-            메시지 전송
+            축하 메시지 보내기
           </Button>
         </CardFooter>
       </Card>

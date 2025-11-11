@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { CalendarSection } from "./components/sections/CalendarSection";
 import { FooterSection } from "./components/sections/FooterSection";
 import { HeaderSection } from "./components/sections/HeaderSection";
+import { ImageUploadSection } from "./components/sections/ImageUploadSection";
 import { LocationSection } from "./components/sections/LocationSection";
 import { MessageSection } from "./components/sections/MessageSection";
 import { useAutoVersionCheck } from "./hooks/useAutoVersionCheck";
@@ -17,6 +18,7 @@ const App: React.FC = () => {
           <CalendarSection />
           <LocationSection />
           <MessageSection />
+          <ImageUploadSection />
           <FooterSection />
         </main>
       </div>
