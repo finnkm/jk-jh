@@ -12,14 +12,14 @@ import {
 } from "@/components/ui/item";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
-import { useUploadToR2 } from "@/hooks/useUploadToR2";
+import { useGoogleCloudStorageBucket } from "@/hooks/useGoogleCloudStorageBucket";
 
 export const ImageUploadSection: React.FC = () => {
   const [isUploadingState, setIsUploadingState] = useState(false);
   const [uploadedSize, setUploadedSize] = useState(0);
   const [totalSize, setTotalSize] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadToR2, uploading, progress } = useUploadToR2();
+  const { uploadFile, uploading, progress } = useGoogleCloudStorageBucket();
 
   const handleButtonClick = () => {
     if (fileInputRef.current) {
@@ -38,7 +38,7 @@ export const ImageUploadSection: React.FC = () => {
       console.log("Selected files:", Array.from(files));
       for (const file of files) {
         try {
-          const result = await uploadToR2(file);
+          const result = await uploadFile(file);
           uploaded += file.size;
           setUploadedSize(uploaded);
           console.log("Upload successful:", result);
