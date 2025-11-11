@@ -95,7 +95,11 @@ export const ImageUploadSection: React.FC = () => {
               <Spinner />
             </ItemMedia>
             <ItemContent>
-              <ItemTitle>사진을 업로드 하고있어요...</ItemTitle>
+              <ItemTitle>
+                사진을 업로드 하고있어요...
+                <br />
+                ‼️ 창을 닫거나 새로고침하시면 업로드가 중단될 수 있어요. ‼️
+              </ItemTitle>
               <ItemDescription>
                 {uploadedMB} MB / {totalMB} MB {remainingTime ?? ""}
               </ItemDescription>
