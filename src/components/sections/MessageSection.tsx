@@ -50,7 +50,7 @@ export const MessageSection: React.FC = () => {
     <section className="w-full flex items-center justify-center">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>축하메세지를 남겨보세요</CardTitle>
+          <CardTitle>축하메시지를 남겨보세요</CardTitle>
           <CardDescription>남겨주신 메시지는 신랑신부에게 즉시 전달됩니다.</CardDescription>
         </CardHeader>
         <CardContent>

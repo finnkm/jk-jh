@@ -25,7 +25,6 @@ export const ImageUploadSection: React.FC = () => {
   const { send } = useDiscordWebhook();
 
   const handleButtonClick = () => {
-    send({ content: "누군가 사진 업로드를 시도했습니다." });
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -74,11 +73,12 @@ export const ImageUploadSection: React.FC = () => {
       } catch (error) {
         console.error("Upload error:", error);
         toast.error("사진 업로드 중 오류가 발생했어요. 다시 시도해주세요.");
+      } finally {
+        setIsUploadingState(false);
+        setUploadedSize(0);
+        setTotalSize(0);
+        send({ content: "누군가 사진 업로드를 시도했습니다." });
       }
-
-      setIsUploadingState(false);
-      setUploadedSize(0);
-      setTotalSize(0);
     }
   };
 
