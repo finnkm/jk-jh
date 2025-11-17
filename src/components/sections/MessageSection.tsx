@@ -92,7 +92,7 @@ export const MessageSection: React.FC = () => {
 
   return (
     <>
-      <section className="w-full flex items-center justify-center bg-primary/5 flex-col p-10 gap-2">
+      <section className="w-full flex items-center justify-center bg-primary/5 flex-col p-6 gap-2">
         축하메시지를 남겨보세요
         <div className="flex flex-col gap-2 w-full">
           <div className="gap-2 flex-row flex">
