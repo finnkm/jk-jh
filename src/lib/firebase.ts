@@ -1,6 +1,8 @@
 import { getAnalytics, isSupported, logEvent } from "firebase/analytics";
 import type { Analytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
+import { getDatabase } from "firebase/database";
+import type { Database } from "firebase/database";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -11,6 +13,7 @@ const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
 };
 
 // Firebase 초기화
@@ -18,6 +21,9 @@ const app = initializeApp(firebaseConfig);
 
 // Storage 인스턴스 생성
 export const storage = getStorage(app);
+
+// Database 인스턴스 생성
+export const database: Database = getDatabase(app);
 
 // Analytics 초기화 (브라우저 환경에서만)
 let analytics: Analytics | null = null;
