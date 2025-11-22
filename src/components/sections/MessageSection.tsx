@@ -19,6 +19,12 @@ import useDiscordWebhook from "@/hooks/useDiscordWebhook";
 import type { MessageRequest, MessageResponse } from "@/hooks/useFirebaseDatabase";
 import { useFirebaseDatabase } from "@/hooks/useFirebaseDatabase";
 
+const preventSpaceInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (e.key === " ") {
+    e.preventDefault();
+  }
+};
+
 export const MessageSection: React.FC = () => {
   const [payload, setPayload] = useState<MessageRequest>({
     name: "",
@@ -57,9 +63,9 @@ export const MessageSection: React.FC = () => {
 
     try {
       await addMessage({
-        name: payload.name,
-        content: payload.content,
-        password: payload.password,
+        name: payload.name.trim(),
+        content: payload.content.trim(),
+        password: payload.password.trim(),
         createdAt: Date.now(),
       });
       toast.success("축하 메시지가 성공적으로 등록되었습니다!");
@@ -94,7 +100,7 @@ export const MessageSection: React.FC = () => {
   return (
     <>
       <section className="w-full flex items-center justify-center bg-primary/5 flex-col p-6 gap-2">
-        축하메시지를 남겨보세요
+        축하 메시지를 남겨보세요
         <div className="flex flex-col gap-2 w-full">
           <div className="gap-2 flex-row flex">
             {loading ? (
@@ -108,6 +114,7 @@ export const MessageSection: React.FC = () => {
                 maxLength={20}
                 value={payload.name}
                 onChange={(e) => setPayload({ ...payload, name: e.target.value })}
+                onKeyDown={preventSpaceInput}
               />
             )}
             {loading ? (
@@ -120,7 +127,7 @@ export const MessageSection: React.FC = () => {
                 required
                 maxLength={20}
                 value={payload.password}
-                onChange={(e) => setPayload({ ...payload, password: e.target.value })}
+                onChange={(e) => setPayload({ ...payload, password: e.target.value.replace(/[^a-zA-Z0-9]/g, "") })}
               />
             )}
           </div>
@@ -145,7 +152,10 @@ export const MessageSection: React.FC = () => {
             축하 메시지 남기기
           </Button>
         </div>
-        <div className="w-full">
+        <div className="w-full flex flex-col gap-2">
+          <div className="w-full flex items-center justify-center">
+            <p className="py-5">💐 축하 메시지 💐</p>
+          </div>
           {messages.map((message: MessageResponse) => (
             <Item key={message.id} variant="outline">
               <ItemContent>
@@ -176,7 +186,7 @@ export const MessageSection: React.FC = () => {
                 required
                 maxLength={20}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
               />
             </DialogHeader>
             <DialogFooter>
