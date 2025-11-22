@@ -152,26 +152,28 @@ export const MessageSection: React.FC = () => {
             축하 메시지 남기기
           </Button>
         </div>
-        <div className="w-full flex flex-col gap-2">
-          <div className="w-full flex items-center justify-center">
-            <p className="py-5">💐 축하 메시지 💐</p>
+        {messages.length > 0 && (
+          <div className="w-full flex flex-col gap-2">
+            <div className="w-full flex items-center justify-center">
+              <p className="py-5">💐 축하 메시지 💐</p>
+            </div>
+            {messages.map((message: MessageResponse) => (
+              <Item key={message.id} variant="outline">
+                <ItemContent>
+                  <ItemTitle>
+                    {message.name} ({format(new Date(message.createdAt), "yyyy-MM-dd")})
+                  </ItemTitle>
+                  <ItemDescription>{message.content}</ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                  <Button variant="outline" size="sm" onClick={() => setDeleteMessageAction(message.id)}>
+                    삭제
+                  </Button>
+                </ItemActions>
+              </Item>
+            ))}
           </div>
-          {messages.map((message: MessageResponse) => (
-            <Item key={message.id} variant="outline">
-              <ItemContent>
-                <ItemTitle>
-                  {message.name} ({format(new Date(message.createdAt), "yyyy-MM-dd")})
-                </ItemTitle>
-                <ItemDescription>{message.content}</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <Button variant="outline" size="sm" onClick={() => setDeleteMessageAction(message.id)}>
-                  삭제
-                </Button>
-              </ItemActions>
-            </Item>
-          ))}
-        </div>
+        )}
       </section>
       {deleteMessageAction && (
         <Dialog open={Boolean(deleteMessageAction)} onOpenChange={() => setDeleteMessageAction(undefined)}>
