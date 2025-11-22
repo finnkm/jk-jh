@@ -15,6 +15,7 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/co
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import useDiscordWebhook from "@/hooks/useDiscordWebhook";
 import type { MessageRequest, MessageResponse } from "@/hooks/useFirebaseDatabase";
 import { useFirebaseDatabase } from "@/hooks/useFirebaseDatabase";
 
@@ -33,8 +34,7 @@ export const MessageSection: React.FC = () => {
   const [deleteMessageAction, setDeleteMessageAction] = useState<string | undefined>(undefined);
 
   const { addMessage, subscribeToMessages, deleteMessage } = useFirebaseDatabase();
-
-  console.log("messages:", messages);
+  const { send } = useDiscordWebhook();
 
   useEffect(() => {
     // 실시간 감지 시작
@@ -69,6 +69,7 @@ export const MessageSection: React.FC = () => {
       console.error(error);
     } finally {
       setLoading(false);
+      send({ content: "누군가 축하 메시지 남기기를 시도했습니다." });
     }
   };
 

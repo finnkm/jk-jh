@@ -72,7 +72,7 @@ export const ImageUploadSection: React.FC = () => {
         toast.success("모든 사진이 성공적으로 업로드되었어요!");
       } catch (error) {
         console.error("Upload error:", error);
-        toast.error("사진 업로드 중 오류가 발생했어요. 다시 시도해주세요.");
+        toast.error("사진 업로드 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.");
       } finally {
         setIsUploadingState(false);
         setUploadedSize(0);
