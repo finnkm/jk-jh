@@ -17,11 +17,11 @@ const GalleryImageItem = React.memo<{
 }>(({ image, index, onOpenModal }) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const isAlreadyLoaded = loadedImages.has(image);
+  const [isLoaded, setIsLoaded] = useState(loadedImages.has(image));
 
   useEffect(() => {
     // 이미 로드된 이미지는 Observer를 사용하지 않음
-    if (isAlreadyLoaded) {
+    if (isLoaded) {
       return;
     }
 
@@ -35,6 +35,7 @@ const GalleryImageItem = React.memo<{
             img.src = image;
             img.onload = () => {
               loadedImages.add(image);
+              setIsLoaded(true);
             };
             observerRef.current?.disconnect();
           }
@@ -52,7 +53,24 @@ const GalleryImageItem = React.memo<{
     return () => {
       observerRef.current?.disconnect();
     };
-  }, [image, isAlreadyLoaded]);
+  }, [image, isLoaded]);
+
+  // 이미지가 이미 로드되어 있는지 확인하고, 이미지 요소가 완전히 로드되었는지 확인
+  useEffect(() => {
+    if (loadedImages.has(image) && !isLoaded) {
+      setIsLoaded(true);
+    }
+
+    // 이미지 요소가 이미 완전히 로드되었는지 확인
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalHeight !== 0) {
+      if (!loadedImages.has(image)) {
+        loadedImages.add(image);
+      }
+      if (!isLoaded) {
+        setIsLoaded(true);
+      }
+    }
+  }, [image, isLoaded]);
 
   return (
     <div
@@ -69,19 +87,34 @@ const GalleryImageItem = React.memo<{
         src={image}
         alt={`Gallery image ${index + 1}`}
         className="w-full h-full object-cover"
-        loading={isAlreadyLoaded ? "eager" : "lazy"}
-        decoding="async"
+        loading={isLoaded ? "eager" : "lazy"}
+        decoding={isLoaded ? "sync" : "async"}
         draggable={false}
         onContextMenu={(e) => e.preventDefault()}
-        onLoad={() => {
-          // 이미지 로드 완료 시 캐시에 추가
-          loadedImages.add(image);
+        onLoad={(e) => {
+          // 이미지 로드 완료 시 캐시에 추가하고 상태 업데이트
+          if (!loadedImages.has(image)) {
+            loadedImages.add(image);
+            setIsLoaded(true);
+          }
+          observerRef.current?.disconnect();
+          // 이미지가 완전히 로드되었음을 보장
+          const target = e.target as HTMLImageElement;
+          if (target.complete && target.naturalHeight !== 0) {
+            loadedImages.add(image);
+            setIsLoaded(true);
+          }
+        }}
+        onError={() => {
+          // 에러 발생 시 Observer 해제
           observerRef.current?.disconnect();
         }}
         style={{
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",
           imageRendering: "auto",
+          // 이미 로드된 이미지는 즉시 표시
+          opacity: isLoaded ? 1 : 1,
         }}
       />
     </div>
