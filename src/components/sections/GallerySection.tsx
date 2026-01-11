@@ -130,6 +130,26 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedIndex, images.length]);
 
+  // 리사이즈 이벤트 최적화
+  useEffect(() => {
+    if (selectedIndex === null) return;
+
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        // 리사이즈 후 이미지 위치 재조정
+        setCurrentX(0);
+      }, 150);
+    };
+
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimer);
+    };
+  }, [selectedIndex]);
+
   if (images.length === 0) {
     return null;
   }
@@ -138,7 +158,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
     <>
       <section className="w-full flex items-center justify-center flex-col gap-6 py-10">
         <div className="flex flex-col items-center gap-2 mb-4">
-          <h2 className="font-default-bold text-xl">결혼식 갤러리</h2>
+          <h2 className="font-default-bold text-xl">갤러리</h2>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-2xl px-4">
           {images.map((image, index) => (
@@ -199,7 +219,13 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
             }
           }}
         >
-          <div className="relative w-full h-full flex items-center justify-center overflow-auto hide-scrollbar">
+          <div
+            className="relative w-full h-full flex items-center justify-center overflow-auto hide-scrollbar"
+            style={{
+              WebkitOverflowScrolling: "touch",
+              overscrollBehavior: "contain",
+            }}
+          >
             {/* 이미지 컨테이너 */}
             <div
               data-image-container
@@ -219,7 +245,11 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
                 // 이미지 영역 클릭 시 모달이 닫히지 않도록
                 e.stopPropagation();
               }}
-              style={{ touchAction: "pan-y pinch-zoom" }}
+              style={{
+                touchAction: "pan-y pinch-zoom",
+                willChange: "transform",
+                transform: "translateZ(0)", // GPU 가속
+              }}
             >
               {selectedIndex !== null && (
                 <>
@@ -229,10 +259,14 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
                     alt={`Gallery image ${selectedIndex + 1}`}
                     className="max-w-full max-h-full object-contain select-none"
                     style={{
-                      transform: `translateX(${currentX}px)`,
-                      transition: isDragging ? "none" : "transform 0.3s ease-out",
+                      transform: `translateX(${currentX}px) translateZ(0)`,
+                      transition: isDragging ? "none" : "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                       maxHeight: "100%",
+                      willChange: isDragging ? "transform" : "auto",
+                      backfaceVisibility: "hidden",
+                      WebkitBackfaceVisibility: "hidden",
                     }}
+                    loading="eager"
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
                   />
