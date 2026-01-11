@@ -288,21 +288,50 @@ const GalleryImageItem = React.memo<{
     }
   };
 
+  const handleClick = () => {
+    // 마우스 클릭은 항상 허용
+    onOpenModal(index);
+  };
+
+  const handleTouchEndWithClick = (e: React.TouchEvent) => {
+    handleTouchEnd(e);
+
+    // 롱프레스가 아닌 경우에만 모달 열기
+    const touchDuration = Date.now() - touchStartTimeRef.current;
+    const isLongPress = touchDuration > 500 && touchStartPosRef.current !== null;
+
+    if (!isLongPress && touchStartPosRef.current !== null) {
+      // 일반 탭인 경우 모달 열기
+      e.preventDefault(); // 기본 동작 방지 (스크롤 등)
+      onOpenModal(index);
+    }
+  };
+
   return (
     <div
       className="aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-90 relative"
-      onClick={() => onOpenModal(index)}
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEndWithClick}
+      onContextMenu={handleContextMenu}
+      onMouseDown={handleMouseDown}
       style={{
         contain: "strict",
         transform: "translateZ(0)",
         isolation: "isolate",
+        WebkitUserSelect: "none",
+        userSelect: "none",
+        WebkitTouchCallout: "none",
+        touchAction: "manipulation", // 더블탭 줌 방지 및 터치 최적화
+        WebkitTapHighlightColor: "transparent", // 탭 하이라이트 제거
       }}
     >
       <img
         ref={imgRef}
         src={image}
         alt={`Gallery image ${index + 1}`}
-        className="w-full h-full object-cover pointer-events-none"
+        className="w-full h-full object-cover"
         // 이미 로드된 이미지는 항상 eager로 설정하여 브라우저가 언로드하지 않도록 함
         loading={isLoaded ? "eager" : "lazy"}
         decoding={isLoaded ? "sync" : "async"}
@@ -331,23 +360,7 @@ const GalleryImageItem = React.memo<{
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",
           imageRendering: "auto",
-        }}
-      />
-      {/* 투명한 오버레이로 이미지 직접 터치 차단 (클릭은 허용) */}
-      <div
-        className="absolute inset-0 z-10"
-        onClick={() => onOpenModal(index)}
-        onContextMenu={handleContextMenu}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onMouseDown={handleMouseDown}
-        style={{
-          touchAction: "pan-y", // 세로 스크롤만 허용
-          WebkitUserSelect: "none",
-          userSelect: "none",
-          WebkitTouchCallout: "none",
-          pointerEvents: "auto", // 클릭 이벤트 허용
+          pointerEvents: "none", // 이미지 자체는 클릭 이벤트를 받지 않음
         }}
       />
     </div>
@@ -607,6 +620,12 @@ export const GallerySection: React.FC = () => {
                 // 이미지 영역 클릭 시 모달이 닫히지 않도록
                 e.stopPropagation();
               }}
+              style={{
+                WebkitUserSelect: "none",
+                userSelect: "none",
+                WebkitTouchCallout: "none",
+                touchAction: "pan-y", // 세로 스크롤 허용
+              }}
             >
               {selectedIndex !== null && (
                 <>
@@ -708,6 +727,7 @@ export const GallerySection: React.FC = () => {
                         userSelect: "none",
                         WebkitTouchCallout: "none",
                         pointerEvents: "auto", // 클릭 이벤트 허용
+                        WebkitTapHighlightColor: "transparent", // 탭 하이라이트 제거
                       }}
                     />
                   </div>
