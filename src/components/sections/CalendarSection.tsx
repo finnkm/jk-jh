@@ -12,8 +12,7 @@ export const CalendarSection: React.FC = () => {
   return (
     <section className="w-full flex items-center justify-center flex-col gap-7 bg-primary/5 py-10">
       <div className="flex flex-col items-center gap-2">
-        <p className="font-default-bold text-xl ">2026. 4. 18</p>
-        <p className="text-xs">토요일 오후 4시</p>
+        <p className="text-sm">2026년 4월 18일 토요일 | 오후 4시</p>
       </div>
       <div className="h-px w-4/5 bg-gray-300" />
       <style>{`
