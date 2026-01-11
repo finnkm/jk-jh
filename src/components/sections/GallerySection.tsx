@@ -227,12 +227,23 @@ const GalleryImageItem = React.memo<{
     return false;
   };
 
+  const touchStartTimeRef = useRef<number>(0);
+  const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+
   const handleTouchStart = (e: React.TouchEvent) => {
     // 멀티터치(핀치 줌) 즉시 차단
     if (e.touches.length > 1) {
       e.preventDefault();
       e.stopPropagation();
       return false;
+    }
+    // 터치 시작 시간과 위치 기록
+    touchStartTimeRef.current = Date.now();
+    if (e.touches.length === 1) {
+      touchStartPosRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
     }
   };
 
@@ -243,11 +254,30 @@ const GalleryImageItem = React.memo<{
       e.stopPropagation();
       return false;
     }
+    // 터치가 많이 움직였으면 롱프레스가 아님 (스크롤)
+    if (touchStartPosRef.current && e.touches.length === 1) {
+      const deltaX = Math.abs(e.touches[0].clientX - touchStartPosRef.current.x);
+      const deltaY = Math.abs(e.touches[0].clientY - touchStartPosRef.current.y);
+      if (deltaX > 10 || deltaY > 10) {
+        touchStartPosRef.current = null; // 스크롤로 판단
+      }
+    }
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    // 롱프레스 후 터치 종료 시에도 차단
-    e.preventDefault();
+    // 롱프레스 감지 (500ms 이상 누르고 있고, 움직임이 적은 경우)
+    const touchDuration = Date.now() - touchStartTimeRef.current;
+    const isLongPress = touchDuration > 500 && touchStartPosRef.current !== null;
+
+    if (isLongPress) {
+      // 롱프레스인 경우에만 차단
+      e.preventDefault();
+      e.stopPropagation();
+      touchStartPosRef.current = null;
+      return false;
+    }
+    // 일반 클릭은 허용 (preventDefault 호출 안 함)
+    touchStartPosRef.current = null;
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -306,6 +336,7 @@ const GalleryImageItem = React.memo<{
       {/* 투명한 오버레이로 이미지 직접 터치 차단 (클릭은 허용) */}
       <div
         className="absolute inset-0 z-10"
+        onClick={() => onOpenModal(index)}
         onContextMenu={handleContextMenu}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -316,6 +347,7 @@ const GalleryImageItem = React.memo<{
           WebkitUserSelect: "none",
           userSelect: "none",
           WebkitTouchCallout: "none",
+          pointerEvents: "auto", // 클릭 이벤트 허용
         }}
       />
     </div>
@@ -333,6 +365,8 @@ export const GallerySection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const lastScrollTop = useRef(0);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const modalTouchStartTimeRef = useRef<number>(0);
+  const modalTouchStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
   // 빠른 스크롤 감지 및 적극적인 프리로딩
   useEffect(() => {
@@ -621,6 +655,14 @@ export const GallerySection: React.FC = () => {
                           e.stopPropagation();
                           return false;
                         }
+                        // 터치 시작 시간과 위치 기록
+                        modalTouchStartTimeRef.current = Date.now();
+                        if (e.touches.length === 1) {
+                          modalTouchStartPosRef.current = {
+                            x: e.touches[0].clientX,
+                            y: e.touches[0].clientY,
+                          };
+                        }
                       }}
                       onTouchMove={(e) => {
                         // 스크롤 중에도 멀티터치 감지 및 차단
@@ -629,10 +671,29 @@ export const GallerySection: React.FC = () => {
                           e.stopPropagation();
                           return false;
                         }
+                        // 터치가 많이 움직였으면 롱프레스가 아님 (스크롤)
+                        if (modalTouchStartPosRef.current && e.touches.length === 1) {
+                          const deltaX = Math.abs(e.touches[0].clientX - modalTouchStartPosRef.current.x);
+                          const deltaY = Math.abs(e.touches[0].clientY - modalTouchStartPosRef.current.y);
+                          if (deltaX > 10 || deltaY > 10) {
+                            modalTouchStartPosRef.current = null; // 스크롤로 판단
+                          }
+                        }
                       }}
                       onTouchEnd={(e) => {
-                        // 롱프레스 후 터치 종료 시에도 차단
-                        e.preventDefault();
+                        // 롱프레스 감지 (500ms 이상 누르고 있고, 움직임이 적은 경우)
+                        const touchDuration = Date.now() - modalTouchStartTimeRef.current;
+                        const isLongPress = touchDuration > 500 && modalTouchStartPosRef.current !== null;
+
+                        if (isLongPress) {
+                          // 롱프레스인 경우에만 차단
+                          e.preventDefault();
+                          e.stopPropagation();
+                          modalTouchStartPosRef.current = null;
+                          return false;
+                        }
+                        // 일반 터치/클릭은 허용
+                        modalTouchStartPosRef.current = null;
                       }}
                       onMouseDown={(e) => {
                         // 우클릭 및 드래그 방지
@@ -646,6 +707,7 @@ export const GallerySection: React.FC = () => {
                         WebkitUserSelect: "none",
                         userSelect: "none",
                         WebkitTouchCallout: "none",
+                        pointerEvents: "auto", // 클릭 이벤트 허용
                       }}
                     />
                   </div>
