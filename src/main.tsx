@@ -22,7 +22,7 @@ const preventZoom = () => {
 
   // 페이지 로드 시 및 포커스 시 viewport 재설정
   setViewport();
-  
+
   // 리사이즈 이벤트 최적화 (debounce)
   let resizeTimer: ReturnType<typeof setTimeout>;
   const handleResize = () => {
@@ -31,13 +31,17 @@ const preventZoom = () => {
       setViewport();
     }, 250); // 250ms debounce
   };
-  
+
   window.addEventListener("resize", handleResize, { passive: true });
-  window.addEventListener("orientationchange", () => {
-    // orientationchange는 즉시 실행
-    clearTimeout(resizeTimer);
-    setViewport();
-  }, { passive: true });
+  window.addEventListener(
+    "orientationchange",
+    () => {
+      // orientationchange는 즉시 실행
+      clearTimeout(resizeTimer);
+      setViewport();
+    },
+    { passive: true }
+  );
   document.addEventListener("focusin", setViewport, { passive: true });
 
   // 멀티터치 감지 및 차단
