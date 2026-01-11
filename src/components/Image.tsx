@@ -13,18 +13,20 @@ export const Image: React.FC<ImageProps> = ({ src, text }) => {
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    // 멀티터치(핀치 줌)만 방지, 단일 터치는 스크롤 허용
+    // 멀티터치(핀치 줌) 즉시 차단
     if (e.touches.length > 1) {
       e.preventDefault();
       e.stopPropagation();
+      return false;
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    // 멀티터치(핀치 줌)만 방지
+    // 스크롤 중에도 멀티터치 감지 및 차단
     if (e.touches.length > 1) {
       e.preventDefault();
       e.stopPropagation();
+      return false;
     }
   };
 
