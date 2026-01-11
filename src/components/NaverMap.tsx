@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
-import kakaoIcon from "@/assets/kakaomap.png";
-import naverIcon from "@/assets/navermap.png";
-import tmapIcon from "@/assets/tmap.png";
+import kakaoIcon from "@/assets/kakaomap.webp";
+import naverIcon from "@/assets/navermap.webp";
+import tmapIcon from "@/assets/tmap.webp";
 import { Drawer, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { useNavigation } from "@/hooks/useNavigation";
 import { Button } from "./ui/button";

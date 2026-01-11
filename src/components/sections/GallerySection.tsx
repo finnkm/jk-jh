@@ -1,10 +1,46 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { XIcon } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogFooter } from "@/components/ui/dialog";
 
 interface GallerySectionProps {
   images: string[];
 }
+
+// 이미지 아이템 메모이제이션
+const GalleryImageItem = React.memo<{
+  image: string;
+  index: number;
+  onOpenModal: (index: number) => void;
+}>(({ image, index, onOpenModal }) => {
+  return (
+    <div
+      className="aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-90"
+      onClick={() => onOpenModal(index)}
+      style={{
+        contain: "strict",
+        transform: "translateZ(0)",
+        isolation: "isolate",
+      }}
+    >
+      <img
+        src={image}
+        alt={`Gallery image ${index + 1}`}
+        className="w-full h-full object-cover"
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+        onContextMenu={(e) => e.preventDefault()}
+        style={{
+          backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden",
+          imageRendering: "auto",
+        }}
+      />
+    </div>
+  );
+});
+
+GalleryImageItem.displayName = "GalleryImageItem";
 
 export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -14,10 +50,10 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
   const [isNavigating, setIsNavigating] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
-  const openModal = (index: number) => {
+  const openModal = useCallback((index: number) => {
     setSelectedIndex(index);
     setCurrentX(0);
-  };
+  }, []);
 
   const closeModal = () => {
     setSelectedIndex(null);
@@ -160,21 +196,15 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
         <div className="flex flex-col items-center gap-2 mb-4">
           <h2 className="font-default-bold text-xl">갤러리</h2>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-2xl px-4">
+        <div
+          className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-2xl px-4"
+          style={{
+            contain: "layout style paint",
+            contentVisibility: "auto",
+          }}
+        >
           {images.map((image, index) => (
-            <div
-              key={index}
-              className="aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-              onClick={() => openModal(index)}
-            >
-              <img
-                src={image}
-                alt={`Gallery image ${index + 1}`}
-                className="w-full h-full object-cover"
-                draggable={false}
-                onContextMenu={(e) => e.preventDefault()}
-              />
-            </div>
+            <GalleryImageItem key={index} image={image} index={index} onOpenModal={openModal} />
           ))}
         </div>
       </section>
