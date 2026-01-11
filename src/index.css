@@ -169,14 +169,28 @@
     outline-width: 1px;
     outline-offset: 2px;
   }
+  html,
   body {
     background-color: var(--background);
     color: var(--foreground);
     font-family: "NanumSquareRoundR", sans-serif;
-    touch-action: manipulation;
+    touch-action: pan-y;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+    overflow-x: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  #root {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
 
   /* 텍스트 선택은 허용 (인사말 등) */
