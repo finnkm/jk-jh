@@ -386,7 +386,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
 
             {/* 푸터 - 현재 이미지 순서 */}
             {selectedIndex !== null && (
-              <DialogFooter className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full">
+              <DialogFooter className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full">
                 <span className="text-sm font-default">
                   {selectedIndex + 1} / {images.length}
                 </span>
