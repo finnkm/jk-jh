@@ -1,9 +1,10 @@
 import { useEffect } from "react";
-import weddingImage from "@/assets/KJK_0853.jpg";
+import mainImage from "@/assets/KJK_0853.jpg";
 import { Image } from "@/components/Image";
 import { Toaster } from "@/components/ui/sonner";
 import { CalendarSection } from "./components/sections/CalendarSection";
 import { FooterSection } from "./components/sections/FooterSection";
+import { GallerySection } from "./components/sections/GallerySection";
 import { GreetingSection } from "./components/sections/GreetingSection";
 import { HeaderSection } from "./components/sections/HeaderSection";
 import { ImageUploadSection } from "./components/sections/ImageUploadSection";
@@ -30,8 +31,9 @@ const App: React.FC = () => {
         <div className="w-full max-w-2xl mx-auto flex flex-col flex-1">
           <HeaderSection />
           <main className="flex flex-1 flex-col px-4 pb-4 gap-10">
-            <Image src={weddingImage} />
+            <Image src={mainImage} />
             <GreetingSection />
+            <GallerySection images={[mainImage, mainImage, mainImage, mainImage, mainImage]} />
             <CalendarSection />
             <LocationSection />
             <MessageSection />
