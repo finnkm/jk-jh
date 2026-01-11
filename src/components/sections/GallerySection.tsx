@@ -16,28 +16,27 @@ const GalleryImageItem = React.memo<{
   onOpenModal: (index: number) => void;
 }>(({ image, index, onOpenModal }) => {
   const imgRef = useRef<HTMLImageElement>(null);
-  const [isLoaded, setIsLoaded] = useState(loadedImages.has(image));
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const isAlreadyLoaded = loadedImages.has(image);
 
   useEffect(() => {
-    // 이미 로드된 이미지는 즉시 표시
-    if (loadedImages.has(image)) {
-      setIsLoaded(true);
+    // 이미 로드된 이미지는 Observer를 사용하지 않음
+    if (isAlreadyLoaded) {
       return;
     }
 
     // Intersection Observer로 이미지 미리 로드
-    const observer = new IntersectionObserver(
+    observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && imgRef.current) {
+          if (entry.isIntersecting && imgRef.current && !loadedImages.has(image)) {
             // 이미지가 뷰포트에 들어오면 미리 로드
             const img = new Image();
             img.src = image;
             img.onload = () => {
               loadedImages.add(image);
-              setIsLoaded(true);
             };
-            observer.disconnect();
+            observerRef.current?.disconnect();
           }
         });
       },
@@ -46,14 +45,14 @@ const GalleryImageItem = React.memo<{
       }
     );
 
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
+    if (imgRef.current && !loadedImages.has(image)) {
+      observerRef.current.observe(imgRef.current);
     }
 
     return () => {
-      observer.disconnect();
+      observerRef.current?.disconnect();
     };
-  }, [image]);
+  }, [image, isAlreadyLoaded]);
 
   return (
     <div
@@ -70,13 +69,14 @@ const GalleryImageItem = React.memo<{
         src={image}
         alt={`Gallery image ${index + 1}`}
         className="w-full h-full object-cover"
-        loading={isLoaded ? "eager" : "lazy"}
+        loading={isAlreadyLoaded ? "eager" : "lazy"}
         decoding="async"
         draggable={false}
         onContextMenu={(e) => e.preventDefault()}
         onLoad={() => {
+          // 이미지 로드 완료 시 캐시에 추가
           loadedImages.add(image);
-          setIsLoaded(true);
+          observerRef.current?.disconnect();
         }}
         style={{
           backfaceVisibility: "hidden",
