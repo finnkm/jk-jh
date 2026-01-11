@@ -173,5 +173,23 @@
     background-color: var(--background);
     color: var(--foreground);
     font-family: "NanumSquareRoundR", sans-serif;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* 텍스트 선택은 허용 (인사말 등) */
+  p,
+  span,
+  div,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    -webkit-user-select: text;
+    user-select: text;
   }
 }
