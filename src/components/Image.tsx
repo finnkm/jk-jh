@@ -13,7 +13,7 @@ export const Image: React.FC<ImageProps> = ({ src, text }) => {
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    // 롱프레스 및 멀티터치 방지
+    // 멀티터치(핀치 줌)만 방지, 단일 터치는 스크롤 허용
     if (e.touches.length > 1) {
       e.preventDefault();
       e.stopPropagation();
@@ -21,11 +21,16 @@ export const Image: React.FC<ImageProps> = ({ src, text }) => {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    // 멀티터치(핀치) 방지
+    // 멀티터치(핀치 줌)만 방지
     if (e.touches.length > 1) {
       e.preventDefault();
       e.stopPropagation();
     }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    // 롱프레스 후 터치 종료 시에도 차단
+    e.preventDefault();
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -47,14 +52,20 @@ export const Image: React.FC<ImageProps> = ({ src, text }) => {
           onContextMenu={handleContextMenu}
           onDragStart={(e) => e.preventDefault()}
         />
-        {/* 투명한 오버레이로 이미지 직접 터치 차단 */}
+        {/* 투명한 오버레이로 이미지 직접 터치 차단 (스크롤은 허용) */}
         <div
           className="absolute inset-0 z-10"
           onContextMenu={handleContextMenu}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
           onMouseDown={handleMouseDown}
-          style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+          style={{
+            touchAction: "pan-y", // 세로 스크롤만 허용
+            WebkitUserSelect: "none",
+            userSelect: "none",
+            WebkitTouchCallout: "none",
+          }}
         />
         {text && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center justify-center z-20 pointer-events-none">

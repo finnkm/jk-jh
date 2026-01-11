@@ -192,4 +192,12 @@
     -webkit-user-select: text;
     user-select: text;
   }
+
+  /* 이미지 저장 방지 */
+  img {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
 }
