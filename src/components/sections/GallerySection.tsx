@@ -1,13 +1,136 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { XIcon } from "lucide-react";
+import image11 from "@/assets/KJK_0037.webp";
+import image1 from "@/assets/KJK_0843.webp";
+import image2 from "@/assets/KJK_0984.webp";
+import image3 from "@/assets/KJK_1179.webp";
+import image4 from "@/assets/KJK_1703.webp";
+import image13 from "@/assets/KJK_1911.webp";
+import image14 from "@/assets/KJK_1992.webp";
+import image5 from "@/assets/KJK_2158.webp";
+import image12 from "@/assets/KJK_2307.webp";
+import image6 from "@/assets/KJK_2504.webp";
+import image10 from "@/assets/KJK_2589.webp";
+import image8 from "@/assets/KJK_2842.webp";
+import image9 from "@/assets/KJK_2932.webp";
+import image7 from "@/assets/KJK_3048.webp";
 import { Dialog, DialogClose, DialogContent, DialogFooter } from "@/components/ui/dialog";
 
-interface GallerySectionProps {
-  images: string[];
+// 갤러리 이미지 배열
+const galleryImages = [
+  image1,
+  image2,
+  image3,
+  image4,
+  image5,
+  image6,
+  image7,
+  image8,
+  image9,
+  image10,
+  image11,
+  image12,
+  image13,
+  image14,
+];
+
+// 이미지 캐시 관리
+interface ImageCacheEntry {
+  loaded: boolean;
+  loading: boolean;
+  error: boolean;
+  timestamp: number;
 }
 
-// 이미지 로드 상태 추적을 위한 Set (브라우저 캐시 활용)
-const loadedImages = new Set<string>();
+const imageCache = new Map<string, ImageCacheEntry>();
+const loadingPromises = new Map<string, Promise<void>>();
+
+// 이미지 프리로드 유틸리티
+const preloadImage = (src: string): Promise<void> => {
+  // 이미 로드된 이미지는 즉시 반환
+  const cached = imageCache.get(src);
+  if (cached?.loaded) {
+    return Promise.resolve();
+  }
+
+  // 이미 로딩 중인 이미지는 기존 Promise 반환
+  const existingPromise = loadingPromises.get(src);
+  if (existingPromise) {
+    return existingPromise;
+  }
+
+  // 새로 로딩 시작
+  const promise = new Promise<void>((resolve, reject) => {
+    // 캐시에 로딩 상태 추가
+    imageCache.set(src, {
+      loaded: false,
+      loading: true,
+      error: false,
+      timestamp: Date.now(),
+    });
+
+    // 브라우저 캐시 확인
+    const img = new Image();
+
+    img.onload = () => {
+      imageCache.set(src, {
+        loaded: true,
+        loading: false,
+        error: false,
+        timestamp: Date.now(),
+      });
+      loadingPromises.delete(src);
+      resolve();
+    };
+
+    img.onerror = () => {
+      imageCache.set(src, {
+        loaded: false,
+        loading: false,
+        error: true,
+        timestamp: Date.now(),
+      });
+      loadingPromises.delete(src);
+      reject(new Error(`Failed to load image: ${src}`));
+    };
+
+    img.src = src;
+  });
+
+  loadingPromises.set(src, promise);
+  return promise;
+};
+
+// 이미지가 로드되었는지 확인
+const isImageLoaded = (src: string): boolean => {
+  return imageCache.get(src)?.loaded ?? false;
+};
+
+// 초기 프리로드: 첫 화면에 보일 이미지들 (약 6개)
+const preloadInitialImages = () => {
+  const initialCount = Math.min(6, galleryImages.length);
+  const initialImages = galleryImages.slice(0, initialCount);
+
+  // 우선순위에 따라 순차적으로 로드 (동시에 너무 많이 로드하지 않음)
+  initialImages.forEach((src, index) => {
+    // 약간의 지연을 두어 네트워크 부하 분산
+    setTimeout(() => {
+      preloadImage(src).catch(() => {
+        // 에러는 무시 (나중에 다시 시도 가능)
+      });
+    }, index * 50);
+  });
+};
+
+// 컴포넌트 마운트 시 초기 이미지 프리로드
+if (typeof window !== "undefined") {
+  // 페이지 로드 후 약간의 지연을 두고 프리로드 시작
+  if (document.readyState === "complete") {
+    preloadInitialImages();
+  } else {
+    window.addEventListener("load", preloadInitialImages);
+  }
+}
 
 // 이미지 아이템 메모이제이션
 const GalleryImageItem = React.memo<{
@@ -19,13 +142,13 @@ const GalleryImageItem = React.memo<{
   const observerRef = useRef<IntersectionObserver | null>(null);
   const [isLoaded, setIsLoaded] = useState(() => {
     // 초기 렌더링 시 이미 로드된 이미지인지 확인
-    return loadedImages.has(image);
+    return isImageLoaded(image);
   });
 
   // 컴포넌트 마운트 시 이미지가 이미 로드되어 있는지 확인
   useEffect(() => {
     // 이미 로드된 이미지는 즉시 eager로 설정
-    if (loadedImages.has(image)) {
+    if (isImageLoaded(image)) {
       setIsLoaded(true);
       return;
     }
@@ -33,7 +156,12 @@ const GalleryImageItem = React.memo<{
     // 이미지 요소가 이미 완전히 로드되었는지 확인 (브라우저 캐시 활용)
     const checkImageLoaded = () => {
       if (imgRef.current && imgRef.current.complete && imgRef.current.naturalHeight !== 0) {
-        loadedImages.add(image);
+        imageCache.set(image, {
+          loaded: true,
+          loading: false,
+          error: false,
+          timestamp: Date.now(),
+        });
         setIsLoaded(true);
         return true;
       }
@@ -42,7 +170,7 @@ const GalleryImageItem = React.memo<{
 
     // 약간의 지연 후 확인 (이미지가 브라우저 캐시에서 로드되는 시간 고려)
     const timeoutId = setTimeout(() => {
-      if (!loadedImages.has(image) && imgRef.current) {
+      if (!isImageLoaded(image) && imgRef.current) {
         checkImageLoaded();
       }
     }, 0);
@@ -52,20 +180,21 @@ const GalleryImageItem = React.memo<{
       observerRef.current = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting && imgRef.current && !loadedImages.has(image)) {
+            if (entry.isIntersecting && imgRef.current && !isImageLoaded(image)) {
               // 이미지가 뷰포트에 들어오면 미리 로드
-              const img = new Image();
-              img.src = image;
-              img.onload = () => {
-                loadedImages.add(image);
-                setIsLoaded(true);
-                observerRef.current?.disconnect();
-              };
+              preloadImage(image)
+                .then(() => {
+                  setIsLoaded(true);
+                  observerRef.current?.disconnect();
+                })
+                .catch(() => {
+                  // 에러 발생 시 Observer는 유지 (나중에 다시 시도 가능)
+                });
             }
           });
         },
         {
-          rootMargin: "200px", // 뷰포트 200px 전에 미리 로드
+          rootMargin: "300px", // 뷰포트 300px 전에 미리 로드 (더 넓은 범위)
         }
       );
 
@@ -102,7 +231,12 @@ const GalleryImageItem = React.memo<{
           // 이미지 로드 완료 시 캐시에 추가하고 상태 업데이트
           const target = e.target as HTMLImageElement;
           if (target.complete && target.naturalHeight !== 0) {
-            loadedImages.add(image);
+            imageCache.set(image, {
+              loaded: true,
+              loading: false,
+              error: false,
+              timestamp: Date.now(),
+            });
             setIsLoaded(true);
             observerRef.current?.disconnect();
           }
@@ -123,7 +257,8 @@ const GalleryImageItem = React.memo<{
 
 GalleryImageItem.displayName = "GalleryImageItem";
 
-export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
+export const GallerySection: React.FC = () => {
+  const images = galleryImages;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
   const [loadedModalImages, setLoadedModalImages] = useState<Set<number>>(new Set());
@@ -324,7 +459,12 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
                     onContextMenu={(e) => e.preventDefault()}
                     onLoad={() => {
                       // 이미지 로드 완료 시 캐시에 추가
-                      loadedImages.add(images[selectedIndex]);
+                      imageCache.set(images[selectedIndex], {
+                        loaded: true,
+                        loading: false,
+                        error: false,
+                        timestamp: Date.now(),
+                      });
                       setLoadedModalImages((prev) => new Set([...prev, selectedIndex]));
                     }}
                   />
