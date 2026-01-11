@@ -221,9 +221,46 @@ const GalleryImageItem = React.memo<{
     };
   }, [image]);
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // 멀티터치(핀치 줌) 즉시 차단
+    if (e.touches.length > 1) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    // 스크롤 중에도 멀티터치 감지 및 차단
+    if (e.touches.length > 1) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    // 롱프레스 후 터치 종료 시에도 차단
+    e.preventDefault();
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    // 우클릭 및 드래그 방지
+    if (e.button === 2 || e.ctrlKey) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
   return (
     <div
-      className="aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-90"
+      className="aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-90 relative"
       onClick={() => onOpenModal(index)}
       style={{
         contain: "strict",
@@ -235,12 +272,13 @@ const GalleryImageItem = React.memo<{
         ref={imgRef}
         src={image}
         alt={`Gallery image ${index + 1}`}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover pointer-events-none"
         // 이미 로드된 이미지는 항상 eager로 설정하여 브라우저가 언로드하지 않도록 함
         loading={isLoaded ? "eager" : "lazy"}
         decoding={isLoaded ? "sync" : "async"}
         draggable={false}
-        onContextMenu={(e) => e.preventDefault()}
+        onContextMenu={handleContextMenu}
+        onDragStart={(e) => e.preventDefault()}
         onLoad={(e) => {
           // 이미지 로드 완료 시 캐시에 추가하고 상태 업데이트
           const target = e.target as HTMLImageElement;
@@ -263,6 +301,21 @@ const GalleryImageItem = React.memo<{
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",
           imageRendering: "auto",
+        }}
+      />
+      {/* 투명한 오버레이로 이미지 직접 터치 차단 (클릭은 허용) */}
+      <div
+        className="absolute inset-0 z-10"
+        onContextMenu={handleContextMenu}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        style={{
+          touchAction: "pan-y", // 세로 스크롤만 허용
+          WebkitUserSelect: "none",
+          userSelect: "none",
+          WebkitTouchCallout: "none",
         }}
       />
     </div>
@@ -524,29 +577,78 @@ export const GallerySection: React.FC = () => {
               {selectedIndex !== null && (
                 <>
                   {/* 현재 이미지 */}
-                  <img
-                    ref={imageRef}
-                    src={images[selectedIndex]}
-                    alt={`Gallery image ${selectedIndex + 1}`}
-                    className="max-w-full max-h-full object-contain select-none"
-                    style={{
-                      maxHeight: "100%",
-                    }}
-                    loading="eager"
-                    decoding="sync"
-                    draggable={false}
-                    onContextMenu={(e) => e.preventDefault()}
-                    onLoad={() => {
-                      // 이미지 로드 완료 시 캐시에 추가
-                      imageCache.set(images[selectedIndex], {
-                        loaded: true,
-                        loading: false,
-                        error: false,
-                        timestamp: Date.now(),
-                      });
-                      setLoadedModalImages((prev) => new Set([...prev, selectedIndex]));
-                    }}
-                  />
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <img
+                      ref={imageRef}
+                      src={images[selectedIndex]}
+                      alt={`Gallery image ${selectedIndex + 1}`}
+                      className="max-w-full max-h-full object-contain select-none pointer-events-none"
+                      style={{
+                        maxHeight: "100%",
+                      }}
+                      loading="eager"
+                      decoding="sync"
+                      draggable={false}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                      }}
+                      onDragStart={(e) => e.preventDefault()}
+                      onLoad={() => {
+                        // 이미지 로드 완료 시 캐시에 추가
+                        imageCache.set(images[selectedIndex], {
+                          loaded: true,
+                          loading: false,
+                          error: false,
+                          timestamp: Date.now(),
+                        });
+                        setLoadedModalImages((prev) => new Set([...prev, selectedIndex]));
+                      }}
+                    />
+                    {/* 투명한 오버레이로 이미지 직접 터치 차단 */}
+                    <div
+                      className="absolute inset-0 z-10"
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                      }}
+                      onTouchStart={(e) => {
+                        // 멀티터치(핀치 줌) 즉시 차단
+                        if (e.touches.length > 1) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          return false;
+                        }
+                      }}
+                      onTouchMove={(e) => {
+                        // 스크롤 중에도 멀티터치 감지 및 차단
+                        if (e.touches.length > 1) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          return false;
+                        }
+                      }}
+                      onTouchEnd={(e) => {
+                        // 롱프레스 후 터치 종료 시에도 차단
+                        e.preventDefault();
+                      }}
+                      onMouseDown={(e) => {
+                        // 우클릭 및 드래그 방지
+                        if (e.button === 2 || e.ctrlKey) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }
+                      }}
+                      style={{
+                        touchAction: "pan-y", // 세로 스크롤만 허용
+                        WebkitUserSelect: "none",
+                        userSelect: "none",
+                        WebkitTouchCallout: "none",
+                      }}
+                    />
+                  </div>
                   {/* 이미지 오른쪽 모서리에 닫기 버튼 */}
                   <DialogClose
                     onClick={(e) => {
