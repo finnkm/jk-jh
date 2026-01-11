@@ -6,12 +6,55 @@ interface GallerySectionProps {
   images: string[];
 }
 
+// 이미지 로드 상태 추적을 위한 Set
+const loadedImages = new Set<string>();
+
 // 이미지 아이템 메모이제이션
 const GalleryImageItem = React.memo<{
   image: string;
   index: number;
   onOpenModal: (index: number) => void;
 }>(({ image, index, onOpenModal }) => {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [isLoaded, setIsLoaded] = useState(loadedImages.has(image));
+
+  useEffect(() => {
+    // 이미 로드된 이미지는 즉시 표시
+    if (loadedImages.has(image)) {
+      setIsLoaded(true);
+      return;
+    }
+
+    // Intersection Observer로 이미지 미리 로드
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && imgRef.current) {
+            // 이미지가 뷰포트에 들어오면 미리 로드
+            const img = new Image();
+            img.src = image;
+            img.onload = () => {
+              loadedImages.add(image);
+              setIsLoaded(true);
+            };
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        rootMargin: "200px", // 뷰포트 200px 전에 미리 로드
+      }
+    );
+
+    if (imgRef.current) {
+      observer.observe(imgRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [image]);
+
   return (
     <div
       className="aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-90"
@@ -23,13 +66,18 @@ const GalleryImageItem = React.memo<{
       }}
     >
       <img
+        ref={imgRef}
         src={image}
         alt={`Gallery image ${index + 1}`}
         className="w-full h-full object-cover"
-        loading="lazy"
+        loading={isLoaded ? "eager" : "lazy"}
         decoding="async"
         draggable={false}
         onContextMenu={(e) => e.preventDefault()}
+        onLoad={() => {
+          loadedImages.add(image);
+          setIsLoaded(true);
+        }}
         style={{
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",
@@ -44,118 +92,100 @@ GalleryImageItem.displayName = "GalleryImageItem";
 
 export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [startX, setStartX] = useState<number>(0);
-  const [currentX, setCurrentX] = useState<number>(0);
-  const [isDragging, setIsDragging] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [loadedModalImages, setLoadedModalImages] = useState<Set<number>>(new Set());
   const imageRef = useRef<HTMLImageElement>(null);
+
+  // 모달 이미지 미리 로드
+  useEffect(() => {
+    if (selectedIndex === null) return;
+
+    // 현재 이미지와 인접한 이미지들을 미리 로드
+    const imagesToPreload = [
+      selectedIndex,
+      selectedIndex > 0 ? selectedIndex - 1 : null,
+      selectedIndex < images.length - 1 ? selectedIndex + 1 : null,
+    ].filter((idx): idx is number => idx !== null);
+
+    imagesToPreload.forEach((idx) => {
+      if (!loadedModalImages.has(idx)) {
+        const img = new Image();
+        img.src = images[idx];
+        img.onload = () => {
+          setLoadedModalImages((prev) => new Set([...prev, idx]));
+        };
+      }
+    });
+  }, [selectedIndex, images, loadedModalImages]);
 
   const openModal = useCallback((index: number) => {
     setSelectedIndex(index);
-    setCurrentX(0);
   }, []);
 
   const closeModal = () => {
     setSelectedIndex(null);
-    setCurrentX(0);
   };
 
-  const goToNext = (e?: React.MouseEvent | React.TouchEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.nativeEvent.stopImmediatePropagation();
-    }
-    setIsNavigating(true);
-    if (selectedIndex !== null && selectedIndex < images.length - 1) {
-      setSelectedIndex(selectedIndex + 1);
-      setCurrentX(0);
-      setIsDragging(false);
-    }
-    // 다음 이벤트 루프에서 플래그 리셋
-    setTimeout(() => setIsNavigating(false), 0);
-  };
+  const goToNext = useCallback(
+    (e?: React.MouseEvent | React.TouchEvent) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
+      }
 
-  const goToPrev = (e?: React.MouseEvent | React.TouchEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.nativeEvent.stopImmediatePropagation();
-    }
-    setIsNavigating(true);
-    if (selectedIndex !== null && selectedIndex > 0) {
-      setSelectedIndex(selectedIndex - 1);
-      setCurrentX(0);
-      setIsDragging(false);
-    }
-    // 다음 이벤트 루프에서 플래그 리셋
-    setTimeout(() => setIsNavigating(false), 0);
-  };
+      // 중복 실행 방지
+      if (isNavigating) return;
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    // 멀티터치는 무시 (핀치 줌 방지)
-    if (e.touches.length > 1) return;
-    setStartX(e.touches[0].clientX);
-    setIsDragging(true);
-  };
+      setIsNavigating(true);
 
-  const handleMouseStart = (e: React.MouseEvent) => {
-    // 우클릭은 무시
-    if (e.button !== 0) return;
-    setStartX(e.clientX);
-    setIsDragging(true);
-  };
+      if (selectedIndex !== null && selectedIndex < images.length - 1) {
+        setSelectedIndex(selectedIndex + 1);
+      }
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || e.touches.length > 1) return;
-    const currentTouchX = e.touches[0].clientX;
-    const diff = currentTouchX - startX;
-    setCurrentX(diff);
-    // 가로 스와이프만 처리, 세로 스크롤은 허용
-  };
+      // 플래그 리셋
+      setTimeout(() => {
+        setIsNavigating(false);
+      }, 200);
+    },
+    [selectedIndex, images.length, isNavigating]
+  );
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const diff = e.clientX - startX;
-    setCurrentX(diff);
-  };
+  const goToPrev = useCallback(
+    (e?: React.MouseEvent | React.TouchEvent) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
+      }
 
-  const handleTouchEnd = () => {
-    if (!isDragging) return;
-    const threshold = 50; // 드래그 임계값
+      // 중복 실행 방지
+      if (isNavigating) return;
 
-    if (currentX > threshold) {
-      goToPrev();
-    } else if (currentX < -threshold) {
-      goToNext();
-    }
+      setIsNavigating(true);
 
-    setIsDragging(false);
-    setCurrentX(0);
-  };
+      if (selectedIndex !== null && selectedIndex > 0) {
+        setSelectedIndex(selectedIndex - 1);
+      }
 
-  const handleMouseEnd = () => {
-    if (!isDragging) return;
-    const threshold = 50;
-
-    if (currentX > threshold) {
-      goToPrev();
-    } else if (currentX < -threshold) {
-      goToNext();
-    }
-
-    setIsDragging(false);
-    setCurrentX(0);
-  };
+      // 플래그 리셋
+      setTimeout(() => {
+        setIsNavigating(false);
+      }, 200);
+    },
+    [selectedIndex, images.length, isNavigating]
+  );
 
   // 키보드 네비게이션
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (selectedIndex === null) return;
+      if (selectedIndex === null || isNavigating) return;
 
       if (e.key === "ArrowLeft") {
+        e.preventDefault();
         goToPrev();
       } else if (e.key === "ArrowRight") {
+        e.preventDefault();
         goToNext();
       } else if (e.key === "Escape") {
         closeModal();
@@ -164,27 +194,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedIndex, images.length]);
-
-  // 리사이즈 이벤트 최적화
-  useEffect(() => {
-    if (selectedIndex === null) return;
-
-    let resizeTimer: NodeJS.Timeout;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        // 리사이즈 후 이미지 위치 재조정
-        setCurrentX(0);
-      }, 150);
-    };
-
-    window.addEventListener("resize", handleResize, { passive: true });
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      clearTimeout(resizeTimer);
-    };
-  }, [selectedIndex]);
+  }, [selectedIndex, images.length, goToPrev, goToNext, isNavigating]);
 
   if (images.length === 0) {
     return null;
@@ -200,7 +210,6 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
           className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-2xl px-4"
           style={{
             contain: "layout style paint",
-            contentVisibility: "auto",
           }}
         >
           {images.map((image, index) => (
@@ -260,45 +269,31 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
             <div
               data-image-container
               className="relative w-full h-full flex items-center justify-center min-h-full"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              onMouseDown={(e) => {
-                // 이미지 영역 클릭 시 모달이 닫히지 않도록
-                e.stopPropagation();
-                handleMouseStart(e);
-              }}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseEnd}
-              onMouseLeave={handleMouseEnd}
               onClick={(e) => {
                 // 이미지 영역 클릭 시 모달이 닫히지 않도록
                 e.stopPropagation();
               }}
-              style={{
-                touchAction: "pan-y pinch-zoom",
-                willChange: "transform",
-                transform: "translateZ(0)", // GPU 가속
-              }}
             >
               {selectedIndex !== null && (
                 <>
+                  {/* 현재 이미지 */}
                   <img
                     ref={imageRef}
                     src={images[selectedIndex]}
                     alt={`Gallery image ${selectedIndex + 1}`}
                     className="max-w-full max-h-full object-contain select-none"
                     style={{
-                      transform: `translateX(${currentX}px) translateZ(0)`,
-                      transition: isDragging ? "none" : "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                       maxHeight: "100%",
-                      willChange: isDragging ? "transform" : "auto",
-                      backfaceVisibility: "hidden",
-                      WebkitBackfaceVisibility: "hidden",
                     }}
                     loading="eager"
+                    decoding="sync"
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
+                    onLoad={() => {
+                      // 이미지 로드 완료 시 캐시에 추가
+                      loadedImages.add(images[selectedIndex]);
+                      setLoadedModalImages((prev) => new Set([...prev, selectedIndex]));
+                    }}
                   />
                   {/* 이미지 오른쪽 모서리에 닫기 버튼 */}
                   <DialogClose
@@ -330,7 +325,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
                   onTouchStart={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    goToPrev(e);
+                    // onClick과 중복 방지
                   }}
                   className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full z-50 pointer-events-auto"
                   aria-label="Previous image"
@@ -367,7 +362,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
                   onTouchStart={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    goToNext(e);
+                    // onClick과 중복 방지
                   }}
                   className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full z-50 pointer-events-auto"
                   aria-label="Next image"
