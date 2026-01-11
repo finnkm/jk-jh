@@ -6,7 +6,7 @@ interface GallerySectionProps {
   images: string[];
 }
 
-// 이미지 로드 상태 추적을 위한 Set
+// 이미지 로드 상태 추적을 위한 Set (브라우저 캐시 활용)
 const loadedImages = new Set<string>();
 
 // 이미지 아이템 메모이제이션
@@ -17,60 +17,66 @@ const GalleryImageItem = React.memo<{
 }>(({ image, index, onOpenModal }) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const [isLoaded, setIsLoaded] = useState(loadedImages.has(image));
+  const [isLoaded, setIsLoaded] = useState(() => {
+    // 초기 렌더링 시 이미 로드된 이미지인지 확인
+    return loadedImages.has(image);
+  });
 
+  // 컴포넌트 마운트 시 이미지가 이미 로드되어 있는지 확인
   useEffect(() => {
-    // 이미 로드된 이미지는 Observer를 사용하지 않음
-    if (isLoaded) {
+    // 이미 로드된 이미지는 즉시 eager로 설정
+    if (loadedImages.has(image)) {
+      setIsLoaded(true);
       return;
     }
 
-    // Intersection Observer로 이미지 미리 로드
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && imgRef.current && !loadedImages.has(image)) {
-            // 이미지가 뷰포트에 들어오면 미리 로드
-            const img = new Image();
-            img.src = image;
-            img.onload = () => {
-              loadedImages.add(image);
-              setIsLoaded(true);
-            };
-            observerRef.current?.disconnect();
-          }
-        });
-      },
-      {
-        rootMargin: "200px", // 뷰포트 200px 전에 미리 로드
+    // 이미지 요소가 이미 완전히 로드되었는지 확인 (브라우저 캐시 활용)
+    const checkImageLoaded = () => {
+      if (imgRef.current && imgRef.current.complete && imgRef.current.naturalHeight !== 0) {
+        loadedImages.add(image);
+        setIsLoaded(true);
+        return true;
       }
-    );
+      return false;
+    };
 
-    if (imgRef.current && !loadedImages.has(image)) {
+    // 약간의 지연 후 확인 (이미지가 브라우저 캐시에서 로드되는 시간 고려)
+    const timeoutId = setTimeout(() => {
+      if (!loadedImages.has(image) && imgRef.current) {
+        checkImageLoaded();
+      }
+    }, 0);
+
+    // Intersection Observer로 이미지 미리 로드
+    if (imgRef.current) {
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && imgRef.current && !loadedImages.has(image)) {
+              // 이미지가 뷰포트에 들어오면 미리 로드
+              const img = new Image();
+              img.src = image;
+              img.onload = () => {
+                loadedImages.add(image);
+                setIsLoaded(true);
+                observerRef.current?.disconnect();
+              };
+            }
+          });
+        },
+        {
+          rootMargin: "200px", // 뷰포트 200px 전에 미리 로드
+        }
+      );
+
       observerRef.current.observe(imgRef.current);
     }
 
     return () => {
+      clearTimeout(timeoutId);
       observerRef.current?.disconnect();
     };
-  }, [image, isLoaded]);
-
-  // 이미지가 이미 로드되어 있는지 확인하고, 이미지 요소가 완전히 로드되었는지 확인
-  useEffect(() => {
-    if (loadedImages.has(image) && !isLoaded) {
-      setIsLoaded(true);
-    }
-
-    // 이미지 요소가 이미 완전히 로드되었는지 확인
-    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalHeight !== 0) {
-      if (!loadedImages.has(image)) {
-        loadedImages.add(image);
-      }
-      if (!isLoaded) {
-        setIsLoaded(true);
-      }
-    }
-  }, [image, isLoaded]);
+  }, [image]);
 
   return (
     <div
@@ -87,22 +93,18 @@ const GalleryImageItem = React.memo<{
         src={image}
         alt={`Gallery image ${index + 1}`}
         className="w-full h-full object-cover"
+        // 이미 로드된 이미지는 항상 eager로 설정하여 브라우저가 언로드하지 않도록 함
         loading={isLoaded ? "eager" : "lazy"}
         decoding={isLoaded ? "sync" : "async"}
         draggable={false}
         onContextMenu={(e) => e.preventDefault()}
         onLoad={(e) => {
           // 이미지 로드 완료 시 캐시에 추가하고 상태 업데이트
-          if (!loadedImages.has(image)) {
-            loadedImages.add(image);
-            setIsLoaded(true);
-          }
-          observerRef.current?.disconnect();
-          // 이미지가 완전히 로드되었음을 보장
           const target = e.target as HTMLImageElement;
           if (target.complete && target.naturalHeight !== 0) {
             loadedImages.add(image);
             setIsLoaded(true);
+            observerRef.current?.disconnect();
           }
         }}
         onError={() => {
@@ -113,8 +115,6 @@ const GalleryImageItem = React.memo<{
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",
           imageRendering: "auto",
-          // 이미 로드된 이미지는 즉시 표시
-          opacity: isLoaded ? 1 : 1,
         }}
       />
     </div>
@@ -262,7 +262,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
         }}
       >
         <DialogContent
-          className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 bg-transparent border-none rounded-none shadow-none backdrop-blur-0"
+          className="w-full h-full p-0 bg-transparent border-none rounded-none shadow-none backdrop-blur-0"
           showCloseButton={false}
           onPointerDownOutside={(e) => {
             // 이미지 영역이나 버튼 클릭은 외부 클릭으로 간주하지 않음
