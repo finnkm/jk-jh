@@ -106,19 +106,23 @@ const isImageLoaded = (src: string): boolean => {
   return imageCache.get(src)?.loaded ?? false;
 };
 
-// 초기 프리로드: 첫 화면에 보일 이미지들 (약 6개)
+// 초기 프리로드: 첫 화면에 보일 이미지들 (더 많이, 더 빠르게)
 const preloadInitialImages = () => {
-  const initialCount = Math.min(6, galleryImages.length);
+  // 첫 화면에 보일 이미지들을 더 많이 프리로드 (약 9-12개)
+  const initialCount = Math.min(12, galleryImages.length);
   const initialImages = galleryImages.slice(0, initialCount);
 
-  // 우선순위에 따라 순차적으로 로드 (동시에 너무 많이 로드하지 않음)
+  // 동시에 여러 이미지를 로드하되, 우선순위에 따라 약간의 지연
   initialImages.forEach((src, index) => {
-    // 약간의 지연을 두어 네트워크 부하 분산
+    // 첫 6개는 즉시, 나머지는 약간의 지연
+    const delay = index < 6 ? 0 : (index - 6) * 30;
     setTimeout(() => {
-      preloadImage(src).catch(() => {
-        // 에러는 무시 (나중에 다시 시도 가능)
-      });
-    }, index * 50);
+      if (!isImageLoaded(src)) {
+        preloadImage(src).catch(() => {
+          // 에러는 무시 (나중에 다시 시도 가능)
+        });
+      }
+    }, delay);
   });
 };
 
@@ -180,21 +184,31 @@ const GalleryImageItem = React.memo<{
       observerRef.current = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting && imgRef.current && !isImageLoaded(image)) {
-              // 이미지가 뷰포트에 들어오면 미리 로드
+            if (entry.isIntersecting && imgRef.current) {
+              // 이미 로드된 이미지는 상태만 업데이트
+              if (isImageLoaded(image)) {
+                setIsLoaded(true);
+                return;
+              }
+
+              // 이미지가 뷰포트에 들어오면 즉시 미리 로드
               preloadImage(image)
                 .then(() => {
                   setIsLoaded(true);
-                  observerRef.current?.disconnect();
+                  // Observer는 유지하여 빠른 스크롤 시에도 대응
                 })
                 .catch(() => {
                   // 에러 발생 시 Observer는 유지 (나중에 다시 시도 가능)
                 });
+            } else if (!entry.isIntersecting && isImageLoaded(image)) {
+              // 뷰포트를 벗어났지만 이미 로드된 경우 상태 유지
+              setIsLoaded(true);
             }
           });
         },
         {
-          rootMargin: "300px", // 뷰포트 300px 전에 미리 로드 (더 넓은 범위)
+          rootMargin: "600px", // 뷰포트 600px 전에 미리 로드 (빠른 스크롤 대응)
+          threshold: 0.01, // 약간만 보여도 트리거
         }
       );
 
@@ -263,6 +277,71 @@ export const GallerySection: React.FC = () => {
   const [isNavigating, setIsNavigating] = useState(false);
   const [loadedModalImages, setLoadedModalImages] = useState<Set<number>>(new Set());
   const imageRef = useRef<HTMLImageElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const lastScrollTop = useRef(0);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 빠른 스크롤 감지 및 적극적인 프리로딩
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+
+      const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollDelta = Math.abs(currentScrollTop - lastScrollTop.current);
+      const scrollingDown = currentScrollTop > lastScrollTop.current;
+      lastScrollTop.current = currentScrollTop;
+
+      // 빠른 스크롤 감지 (100px 이상)
+      if (scrollDelta > 100) {
+        // 현재 뷰포트 기준으로 앞뒤 이미지들을 적극적으로 프리로드
+        const viewportTop = currentScrollTop;
+        const viewportBottom = currentScrollTop + window.innerHeight;
+        const sectionTop = sectionRef.current.offsetTop;
+        const sectionBottom = sectionTop + sectionRef.current.offsetHeight;
+
+        // 뷰포트와 겹치는 범위 계산
+        if (sectionBottom > viewportTop && sectionTop < viewportBottom) {
+          // 갤러리 그리드의 각 이미지 위치 추정 (대략적으로)
+          const gridTop = sectionTop + 100; // 헤더 제외
+          const imageHeight = 200; // 대략적인 이미지 높이 (gap 포함)
+
+          // 현재 보이는 이미지 인덱스 범위 계산
+          const startIndex = Math.max(0, Math.floor((viewportTop - gridTop) / imageHeight));
+          const endIndex = Math.min(images.length - 1, Math.ceil((viewportBottom - gridTop) / imageHeight));
+
+          // 앞뒤로 더 많은 이미지 프리로드 (빠른 스크롤 대응)
+          const preloadRange = scrollingDown ? 8 : 5; // 아래로 스크롤 시 더 많이
+          const preloadStart = Math.max(0, startIndex - (scrollingDown ? 2 : preloadRange));
+          const preloadEnd = Math.min(images.length - 1, endIndex + (scrollingDown ? preloadRange : 2));
+
+          // 범위 내의 이미지들을 프리로드
+          for (let i = preloadStart; i <= preloadEnd; i++) {
+            if (!isImageLoaded(images[i])) {
+              preloadImage(images[i]).catch(() => {
+                // 에러는 무시
+              });
+            }
+          }
+        }
+      }
+
+      // 스크롤이 멈춘 후 정리
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      scrollTimeoutRef.current = setTimeout(() => {
+        // 스크롤이 멈춘 후 추가 프리로드
+      }, 150);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [images]);
 
   // 모달 이미지 미리 로드
   useEffect(() => {
@@ -370,7 +449,7 @@ export const GallerySection: React.FC = () => {
 
   return (
     <>
-      <section className="w-full flex items-center justify-center flex-col gap-6 py-10">
+      <section ref={sectionRef} className="w-full flex items-center justify-center flex-col gap-6 py-10">
         <div className="flex flex-col items-center gap-2 mb-4">
           <h2 className="font-default-bold text-xl">갤러리</h2>
         </div>
