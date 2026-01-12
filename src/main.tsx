@@ -34,7 +34,9 @@ const preventZoom = () => {
 
       // 멀티터치 감지 - 즉시 차단
       if (e.touches.length > 1) {
-        e.preventDefault();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
         e.stopImmediatePropagation();
         // 두 손가락 간 거리 계산
         const touch1 = e.touches[0];
@@ -45,7 +47,9 @@ const preventZoom = () => {
 
       // 더블탭 감지 - 더 엄격하게
       if (now - lastTouchTime < 400) {
-        e.preventDefault();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
         e.stopImmediatePropagation();
         return false;
       }
@@ -60,7 +64,9 @@ const preventZoom = () => {
     (e) => {
       // 멀티터치 즉시 차단
       if (e.touches.length > 1) {
-        e.preventDefault();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
         e.stopImmediatePropagation();
         initialDistance = 0;
         return false;
@@ -74,7 +80,9 @@ const preventZoom = () => {
 
         // 거리 변화가 있으면 확대/축소 시도로 간주
         if (Math.abs(currentDistance - initialDistance) > 5) {
-          e.preventDefault();
+          if (e.cancelable) {
+            e.preventDefault();
+          }
           e.stopImmediatePropagation();
           initialDistance = 0;
           return false;
@@ -89,7 +97,7 @@ const preventZoom = () => {
     (e) => {
       initialDistance = 0;
       const now = Date.now();
-      if (now - lastTouchEnd <= 300) {
+      if (now - lastTouchEnd <= 300 && e.cancelable) {
         e.preventDefault();
       }
       lastTouchEnd = now;

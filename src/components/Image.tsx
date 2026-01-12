@@ -32,7 +32,10 @@ export const Image: React.FC<ImageProps> = ({ src, text }) => {
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     // 롱프레스 후 터치 종료 시에도 차단
-    e.preventDefault();
+    // 스크롤 중이면 preventDefault()가 작동하지 않으므로 cancelable 확인
+    if (e.cancelable) {
+      e.preventDefault();
+    }
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {

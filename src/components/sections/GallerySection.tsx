@@ -14,7 +14,7 @@ import image10 from "@/assets/KJK_2589.webp";
 import image8 from "@/assets/KJK_2842.webp";
 import image9 from "@/assets/KJK_2932.webp";
 import image7 from "@/assets/KJK_3048.webp";
-import { Dialog, DialogClose, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // 갤러리 이미지 배열
 const galleryImages = [
@@ -147,7 +147,8 @@ const GalleryImageItem: React.FC<{
         src={image}
         alt={`Gallery image ${index + 1}`}
         className="w-full h-full object-cover"
-        loading="lazy"
+        loading="eager"
+        fetchPriority="high"
         draggable={false}
         onContextMenu={handleContextMenu}
         onDragStart={(e) => e.preventDefault()}
@@ -254,9 +255,9 @@ const GallerySectionComponent: React.FC = () => {
 
   return (
     <>
-      <section className="w-full flex items-center justify-center flex-col gap-6 py-10">
+      <section className="w-full flex items-center justify-center flex-col gap-6">
         <div className="flex flex-col items-center gap-2 mb-4">
-          <h2 className="font-default-bold text-xl">갤러리</h2>
+          <h2 className="font-default-bold text-xl">Gallery</h2>
         </div>
         <div
           className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-2xl px-4"
@@ -310,6 +311,9 @@ const GallerySectionComponent: React.FC = () => {
             }
           }}
         >
+          <DialogHeader className="sr-only">
+            <DialogTitle>갤러리 이미지 뷰어</DialogTitle>
+          </DialogHeader>
           <div
             className="relative w-full h-full flex items-center justify-center overflow-auto hide-scrollbar"
             style={{

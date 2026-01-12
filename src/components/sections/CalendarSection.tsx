@@ -11,8 +11,12 @@ const DAYS_LEFT = differenceInDays(FIXED_DATE, new Date());
 export const CalendarSection: React.FC = () => {
   return (
     <section className="w-full flex items-center justify-center flex-col gap-7 bg-primary/5 py-10">
+      <div className="flex flex-col items-center gap-2 mb-2">
+        <h2 className="font-default-bold text-xl">Wedding Day</h2>
+      </div>
       <div className="flex flex-col items-center gap-2">
-        <p className="text-sm">2026년 4월 18일 토요일 | 오후 4시</p>
+        <p>2026년 4월 18일 토요일 | 오후 4시</p>
+        <p>잠실 더 베네치아 루터회관 3층</p>
       </div>
       <div className="h-px w-4/5 bg-gray-300" />
       <style>{`
@@ -55,7 +59,7 @@ export const CalendarSection: React.FC = () => {
       />
       <div className="h-px w-4/5 bg-gray-300" />
       <p>
-        재권 ❤️ 지현의 결혼식이 <CountUp from={0} to={DAYS_LEFT} />일 남았습니다.
+        재권 ♥ 지현의 결혼식이 <CountUp from={0} to={DAYS_LEFT} />일 남았습니다.
       </p>
     </section>
   );
