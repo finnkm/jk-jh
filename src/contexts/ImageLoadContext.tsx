@@ -147,6 +147,67 @@ export const ImageLoadProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const observerRef = useRef<IntersectionObserver | null>(null);
   const observedElementsRef = useRef<Map<string, HTMLElement>>(new Map());
 
+  // 이미지 요소를 Observer에서 제거하는 함수
+  const unobserveImage = useCallback((src: string) => {
+    const element = observedElementsRef.current.get(src);
+    if (element && observerRef.current) {
+      observerRef.current.unobserve(element);
+      observedElementsRef.current.delete(src);
+    }
+  }, []);
+
+  // 전역 캐시만 사용하므로 상태 관리 불필요
+  // markImageLoaded는 전역 캐시만 업데이트
+  const markImageLoaded = useCallback(
+    (src: string) => {
+      // 전역 캐시에만 저장 (상태 업데이트 없음 - 무한 루프 방지)
+      imageCache.set(src, {
+        loaded: true,
+        loading: false,
+        error: false,
+        timestamp: Date.now(),
+      });
+      // 로드 완료된 이미지는 Observer에서 제거
+      unobserveImage(src);
+    },
+    [unobserveImage]
+  );
+
+  // HTML에서 preload된 이미지 확인 및 캐시에 마크
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const checkPreloadedImages = () => {
+      // HTML의 preload 링크에서 이미지 경로 추출
+      const preloadLinks = document.querySelectorAll('link[rel="preload"][as="image"]');
+      preloadLinks.forEach((link) => {
+        const href = link.getAttribute("href");
+        if (href) {
+          // 브라우저가 이미 로드한 이미지인지 확인
+          const img = new Image();
+          img.src = href;
+
+          // 이미 로드된 경우 즉시 캐시에 마크
+          if (img.complete && img.naturalHeight !== 0) {
+            markImageLoaded(href);
+          } else {
+            // 로드 중이거나 완료되면 캐시에 마크
+            img.onload = () => {
+              markImageLoaded(href);
+            };
+          }
+        }
+      });
+    };
+
+    // DOMContentLoaded 시점에 확인 (이미지가 preload되어 있을 수 있음)
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", checkPreloadedImages);
+    } else {
+      checkPreloadedImages();
+    }
+  }, [markImageLoaded]);
+
   // 초기 프리로드 실행
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -158,15 +219,6 @@ export const ImageLoadProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           window.removeEventListener("load", preloadInitialImages);
         };
       }
-    }
-  }, []);
-
-  // 이미지 요소를 Observer에서 제거하는 함수
-  const unobserveImage = useCallback((src: string) => {
-    const element = observedElementsRef.current.get(src);
-    if (element && observerRef.current) {
-      observerRef.current.unobserve(element);
-      observedElementsRef.current.delete(src);
     }
   }, []);
 
@@ -204,23 +256,6 @@ export const ImageLoadProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       observerRef.current?.disconnect();
     };
   }, [unobserveImage]);
-
-  // 전역 캐시만 사용하므로 상태 관리 불필요
-  // markImageLoaded는 전역 캐시만 업데이트
-  const markImageLoaded = useCallback(
-    (src: string) => {
-      // 전역 캐시에만 저장 (상태 업데이트 없음 - 무한 루프 방지)
-      imageCache.set(src, {
-        loaded: true,
-        loading: false,
-        error: false,
-        timestamp: Date.now(),
-      });
-      // 로드 완료된 이미지는 Observer에서 제거
-      unobserveImage(src);
-    },
-    [unobserveImage]
-  );
 
   // 이미지 요소를 Observer에 등록하는 함수
   const observeImage = useCallback((element: HTMLElement | null, src: string) => {

@@ -11,6 +11,23 @@ const GalleryImageItem: React.FC<{
   const { isImageLoaded, markImageLoaded, observeImage, unobserveImage } = useImageLoad();
   const imgRef = useRef<HTMLImageElement>(null);
 
+  // 이미지가 이미 브라우저 캐시에 있는지 확인 (preload된 경우)
+  useEffect(() => {
+    if (!isImageLoaded(image)) {
+      const img = new Image();
+      img.src = image;
+      // 이미 로드된 경우 즉시 캐시에 마크
+      if (img.complete && img.naturalHeight !== 0) {
+        markImageLoaded(image);
+      } else {
+        // 로드 완료되면 캐시에 마크
+        img.onload = () => {
+          markImageLoaded(image);
+        };
+      }
+    }
+  }, [image, isImageLoaded, markImageLoaded]);
+
   // Context의 IntersectionObserver에 이미지 등록
   useEffect(() => {
     if (imgRef.current) {
@@ -138,7 +155,7 @@ const GalleryImageItem: React.FC<{
         onLoad={(e) => {
           // 이미지 로드 완료 시 캐시에 추가
           const target = e.target as HTMLImageElement;
-          if (target.complete && target.naturalHeight !== 0 && !isImageLoaded(image)) {
+          if (target.complete && target.naturalHeight !== 0) {
             markImageLoaded(image);
           }
         }}
