@@ -10,6 +10,7 @@ import { HeaderSection } from "./components/sections/HeaderSection";
 import { ImageUploadSection } from "./components/sections/ImageUploadSection";
 import { LocationSection } from "./components/sections/LocationSection";
 import { MessageSection } from "./components/sections/MessageSection";
+import { ImageLoadProvider } from "./contexts/ImageLoadContext";
 import { useAutoVersionCheck } from "./hooks/useAutoVersionCheck";
 import { logAnalyticsEvent } from "./lib/firebase";
 
@@ -26,7 +27,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <ImageLoadProvider>
       <div className="relative flex min-h-svh flex-col">
         <div className="w-full max-w-2xl mx-auto flex flex-col flex-1">
           <HeaderSection />
@@ -43,7 +44,7 @@ const App: React.FC = () => {
         </div>
       </div>
       <Toaster position="bottom-center" />
-    </>
+    </ImageLoadProvider>
   );
 };
 
