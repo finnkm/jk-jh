@@ -1,43 +1,44 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { XIcon } from "lucide-react";
+import image11 from "@/assets/KJK_0037.webp";
+import image1 from "@/assets/KJK_0843.webp";
+import image2 from "@/assets/KJK_0984.webp";
+import image3 from "@/assets/KJK_1179.webp";
+import image4 from "@/assets/KJK_1703.webp";
+import image13 from "@/assets/KJK_1911.webp";
+import image14 from "@/assets/KJK_1992.webp";
+import image5 from "@/assets/KJK_2158.webp";
+import image12 from "@/assets/KJK_2307.webp";
+import image6 from "@/assets/KJK_2504.webp";
+import image10 from "@/assets/KJK_2589.webp";
+import image8 from "@/assets/KJK_2842.webp";
+import image9 from "@/assets/KJK_2932.webp";
+import image7 from "@/assets/KJK_3048.webp";
 import { Dialog, DialogClose, DialogContent, DialogFooter } from "@/components/ui/dialog";
-import { useImageLoad } from "@/contexts/ImageLoadContext";
+
+// 갤러리 이미지 배열
+const galleryImages = [
+  image1,
+  image2,
+  image3,
+  image4,
+  image5,
+  image6,
+  image7,
+  image8,
+  image9,
+  image10,
+  image11,
+  image12,
+  image13,
+  image14,
+];
 
 const GalleryImageItem: React.FC<{
   image: string;
   index: number;
   onOpenModal: (index: number) => void;
 }> = ({ image, index, onOpenModal }) => {
-  const { isImageLoaded, markImageLoaded, observeImage, unobserveImage } = useImageLoad();
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  // 이미지가 이미 브라우저 캐시에 있는지 확인 (preload된 경우)
-  useEffect(() => {
-    if (!isImageLoaded(image)) {
-      const img = new Image();
-      img.src = image;
-      // 이미 로드된 경우 즉시 캐시에 마크
-      if (img.complete && img.naturalHeight !== 0) {
-        markImageLoaded(image);
-      } else {
-        // 로드 완료되면 캐시에 마크
-        img.onload = () => {
-          markImageLoaded(image);
-        };
-      }
-    }
-  }, [image, isImageLoaded, markImageLoaded]);
-
-  // Context의 IntersectionObserver에 이미지 등록
-  useEffect(() => {
-    if (imgRef.current) {
-      observeImage(imgRef.current, image);
-    }
-    return () => {
-      unobserveImage(image);
-    };
-  }, [image, observeImage, unobserveImage]);
-
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -143,22 +144,13 @@ const GalleryImageItem: React.FC<{
       }}
     >
       <img
-        ref={imgRef}
         src={image}
         alt={`Gallery image ${index + 1}`}
         className="w-full h-full object-cover"
-        loading={isImageLoaded(image) ? "eager" : "lazy"}
-        decoding={isImageLoaded(image) ? "sync" : "async"}
+        loading="lazy"
         draggable={false}
         onContextMenu={handleContextMenu}
         onDragStart={(e) => e.preventDefault()}
-        onLoad={(e) => {
-          // 이미지 로드 완료 시 캐시에 추가
-          const target = e.target as HTMLImageElement;
-          if (target.complete && target.naturalHeight !== 0) {
-            markImageLoaded(image);
-          }
-        }}
         style={{
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",
@@ -170,8 +162,7 @@ const GalleryImageItem: React.FC<{
   );
 };
 
-export const GallerySection: React.FC = () => {
-  const { galleryImages, isImageLoaded, markImageLoaded } = useImageLoad();
+const GallerySectionComponent: React.FC = () => {
   const images = galleryImages;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -362,14 +353,6 @@ export const GallerySection: React.FC = () => {
                         return false;
                       }}
                       onDragStart={(e) => e.preventDefault()}
-                      onLoad={() => {
-                        // 이미지 로드 완료 시 캐시에 추가
-                        markImageLoaded(images[selectedIndex]);
-                        // 이미지 로드 완료 시 Context에 마크 (이미 Context에서 관리 중)
-                        if (!isImageLoaded(images[selectedIndex])) {
-                          markImageLoaded(images[selectedIndex]);
-                        }
-                      }}
                     />
                     {/* 투명한 오버레이로 이미지 직접 터치 차단 */}
                     <div
@@ -536,3 +519,5 @@ export const GallerySection: React.FC = () => {
     </>
   );
 };
+
+export const GallerySection = memo(GallerySectionComponent);
