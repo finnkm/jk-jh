@@ -1,19 +1,18 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { XIcon } from "lucide-react";
-import image11 from "@/assets/KJK_0037.webp";
-import image1 from "@/assets/KJK_0843.webp";
+import image4 from "@/assets/KJK_0635.webp";
+import image6 from "@/assets/KJK_0853_1.webp";
 import image2 from "@/assets/KJK_0984.webp";
-import image3 from "@/assets/KJK_1179.webp";
-import image4 from "@/assets/KJK_1703.webp";
-import image13 from "@/assets/KJK_1911.webp";
-import image14 from "@/assets/KJK_1992.webp";
-import image5 from "@/assets/KJK_2158.webp";
-import image12 from "@/assets/KJK_2307.webp";
-import image6 from "@/assets/KJK_2504.webp";
-import image10 from "@/assets/KJK_2589.webp";
-import image8 from "@/assets/KJK_2842.webp";
-import image9 from "@/assets/KJK_2932.webp";
-import image7 from "@/assets/KJK_3048.webp";
+import image3 from "@/assets/KJK_1138.webp";
+import image5 from "@/assets/KJK_1179.webp";
+import image1 from "@/assets/KJK_1382.webp";
+import image7 from "@/assets/KJK_1703.webp";
+import image8 from "@/assets/KJK_1802.webp";
+import image9 from "@/assets/KJK_1911.webp";
+import image10 from "@/assets/KJK_2160.webp";
+import image11 from "@/assets/KJK_2307.webp";
+import image12 from "@/assets/KJK_2589.webp";
+import image13 from "@/assets/KJK_3207.webp";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // 갤러리 이미지 배열
@@ -31,7 +30,6 @@ const galleryImages = [
   image11,
   image12,
   image13,
-  image14,
 ];
 
 const GalleryImageItem: React.FC<{

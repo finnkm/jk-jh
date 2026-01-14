@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import mainImage from "@/assets/KJK_0853.webp";
+import mainImage from "@/assets/MAIN.webp";
 import { Image } from "@/components/Image";
 import { Toaster } from "@/components/ui/sonner";
 import { CalendarSection } from "./components/sections/CalendarSection";
