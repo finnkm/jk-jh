@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { XIcon } from "lucide-react";
 import image4 from "@/assets/KJK_0635.webp";
 import image6 from "@/assets/KJK_0853_1.webp";
@@ -36,18 +36,18 @@ const GalleryImageItem: React.FC<{
   image: string;
   index: number;
   onOpenModal: (index: number) => void;
-}> = ({ image, index, onOpenModal }) => {
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
-  };
-
+}> = memo(({ image, index, onOpenModal }) => {
   const touchStartTimeRef = useRef<number>(0);
   const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
   const hasMovedRef = useRef<boolean>(false); // 터치가 움직였는지 추적
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }, []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     // 멀티터치(핀치 줌) 즉시 차단
     if (e.touches.length > 1) {
       e.preventDefault();
@@ -63,9 +63,9 @@ const GalleryImageItem: React.FC<{
         y: e.touches[0].clientY,
       };
     }
-  };
+  }, []);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
     // 스크롤 중에도 멀티터치 감지 및 차단
     if (e.touches.length > 1) {
       e.preventDefault();
@@ -80,46 +80,53 @@ const GalleryImageItem: React.FC<{
         hasMovedRef.current = true; // 스크롤로 판단
       }
     }
-  };
+  }, []);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     // 우클릭 및 드래그 방지
     if (e.button === 2 || e.ctrlKey) {
       e.preventDefault();
       e.stopPropagation();
     }
-  };
+  }, []);
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     // 마우스 클릭은 항상 허용
     onOpenModal(index);
-  };
+  }, [index, onOpenModal]);
 
-  const handleTouchEndWithClick = (e: React.TouchEvent) => {
-    // 롱프레스 감지 (500ms 이상 누르고 있고, 움직임이 적은 경우)
-    const touchDuration = Date.now() - touchStartTimeRef.current;
-    const isLongPress = touchDuration > 500 && !hasMovedRef.current && touchStartPosRef.current !== null;
+  const handleTouchEndWithClick = useCallback(
+    (e: React.TouchEvent) => {
+      // 롱프레스 감지 (500ms 이상 누르고 있고, 움직임이 적은 경우)
+      const touchDuration = Date.now() - touchStartTimeRef.current;
+      const isLongPress = touchDuration > 500 && !hasMovedRef.current && touchStartPosRef.current !== null;
 
-    if (isLongPress) {
-      // 롱프레스인 경우에만 차단
-      e.preventDefault();
-      e.stopPropagation();
+      if (isLongPress) {
+        // 롱프레스인 경우에만 차단
+        e.preventDefault();
+        e.stopPropagation();
+        touchStartPosRef.current = null;
+        hasMovedRef.current = false;
+        return false;
+      }
+
+      // 일반 탭인 경우 모달 열기 (롱프레스가 아니고, 스크롤도 아닌 경우)
+      if (!hasMovedRef.current && touchStartPosRef.current !== null) {
+        e.preventDefault(); // 기본 동작 방지 (스크롤 등)
+        e.stopPropagation();
+        onOpenModal(index);
+      }
+
+      // 상태 초기화
       touchStartPosRef.current = null;
       hasMovedRef.current = false;
-      return false;
-    }
+    },
+    [index, onOpenModal]
+  );
 
-    // 일반 탭인 경우 모달 열기 (롱프레스가 아니고, 스크롤도 아닌 경우)
-    if (!hasMovedRef.current && touchStartPosRef.current !== null) {
-      e.preventDefault(); // 기본 동작 방지 (스크롤 등)
-      e.stopPropagation();
-      onOpenModal(index);
-    }
-
-    // 상태 초기화
-    touchStartPosRef.current = null;
-    hasMovedRef.current = false;
-  };
+  const handleDragStart = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+  }, []);
 
   return (
     <div
@@ -149,7 +156,7 @@ const GalleryImageItem: React.FC<{
         fetchPriority="high"
         draggable={false}
         onContextMenu={handleContextMenu}
-        onDragStart={(e) => e.preventDefault()}
+        onDragStart={handleDragStart}
         style={{
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",
@@ -159,7 +166,7 @@ const GalleryImageItem: React.FC<{
       />
     </div>
   );
-};
+});
 
 const GallerySectionComponent: React.FC = () => {
   const images = galleryImages;
@@ -172,14 +179,15 @@ const GallerySectionComponent: React.FC = () => {
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
   const swipeDistanceRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const isSwipingRef = useRef<boolean>(false);
+  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const openModal = useCallback((index: number) => {
     setSelectedIndex(index);
   }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setSelectedIndex(null);
-  };
+  }, []);
 
   const goToNext = useCallback(
     (e?: React.MouseEvent | React.TouchEvent) => {
@@ -199,7 +207,10 @@ const GallerySectionComponent: React.FC = () => {
       }
 
       // 플래그 리셋
-      setTimeout(() => {
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current);
+      }
+      navigationTimeoutRef.current = setTimeout(() => {
         setIsNavigating(false);
       }, 200);
     },
@@ -224,12 +235,24 @@ const GallerySectionComponent: React.FC = () => {
       }
 
       // 플래그 리셋
-      setTimeout(() => {
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current);
+      }
+      navigationTimeoutRef.current = setTimeout(() => {
         setIsNavigating(false);
       }, 200);
     },
     [selectedIndex, images.length, isNavigating]
   );
+
+  // cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // 키보드 네비게이션
   useEffect(() => {
@@ -249,7 +272,13 @@ const GallerySectionComponent: React.FC = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedIndex, images.length, goToPrev, goToNext, isNavigating]);
+  }, [selectedIndex, images.length, goToPrev, goToNext, isNavigating, closeModal]);
+
+  // 이미지 카운트 메모이제이션
+  const imageCountText = useMemo(() => {
+    if (selectedIndex === null) return "";
+    return `${selectedIndex + 1} / ${images.length}`;
+  }, [selectedIndex, images.length]);
 
   if (images.length === 0) {
     return null;
@@ -612,9 +641,7 @@ const GallerySectionComponent: React.FC = () => {
             {/* 푸터 - 현재 이미지 순서 */}
             {selectedIndex !== null && (
               <DialogFooter className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full">
-                <span className="text-sm font-default">
-                  {selectedIndex + 1} / {images.length}
-                </span>
+                <span className="text-sm font-default">{imageCountText}</span>
               </DialogFooter>
             )}
           </div>
