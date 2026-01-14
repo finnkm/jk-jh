@@ -177,7 +177,7 @@ export const MessageSection: React.FC = () => {
       </section>
       {deleteMessageAction && (
         <Dialog open={Boolean(deleteMessageAction)} onOpenChange={() => setDeleteMessageAction(undefined)}>
-          <DialogContent className="sm:max-w-[425px] z-100">
+          <DialogContent className="sm:max-w-[425px] z-105">
             <DialogHeader>
               <DialogTitle>비밀번호로 보호된 글 입니다.</DialogTitle>
               <DialogDescription>비밀번호를 입력력해 주세요.</DialogDescription>

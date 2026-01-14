@@ -536,7 +536,7 @@ const GallerySectionComponent: React.FC = () => {
                       e.stopPropagation();
                       closeModal();
                     }}
-                    className="absolute top-2 right-2 z-[102] bg-white/90 hover:bg-white text-black rounded-full p-2 shadow-lg transition-all hover:scale-110"
+                    className="absolute top-2 right-2 z-[105] bg-white/90 hover:bg-white text-black rounded-full p-2 shadow-lg transition-all hover:scale-110"
                     aria-label="Close"
                   >
                     <XIcon className="w-5 h-5" />
