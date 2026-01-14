@@ -168,6 +168,10 @@ const GallerySectionComponent: React.FC = () => {
   const imageRef = useRef<HTMLImageElement>(null);
   const modalTouchStartTimeRef = useRef<number>(0);
   const modalTouchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+  // 슬라이드 제스처를 위한 ref
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
+  const swipeDistanceRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const isSwipingRef = useRef<boolean>(false);
 
   const openModal = useCallback((index: number) => {
     setSelectedIndex(index);
@@ -374,10 +378,18 @@ const GallerySectionComponent: React.FC = () => {
                         // 터치 시작 시간과 위치 기록
                         modalTouchStartTimeRef.current = Date.now();
                         if (e.touches.length === 1) {
+                          const touch = e.touches[0];
                           modalTouchStartPosRef.current = {
-                            x: e.touches[0].clientX,
-                            y: e.touches[0].clientY,
+                            x: touch.clientX,
+                            y: touch.clientY,
                           };
+                          // 슬라이드 시작 위치 기록
+                          swipeStartRef.current = {
+                            x: touch.clientX,
+                            y: touch.clientY,
+                          };
+                          swipeDistanceRef.current = { x: 0, y: 0 };
+                          isSwipingRef.current = false;
                         }
                       }}
                       onTouchMove={(e) => {
@@ -386,6 +398,21 @@ const GallerySectionComponent: React.FC = () => {
                           e.preventDefault();
                           e.stopPropagation();
                           return false;
+                        }
+                        if (swipeStartRef.current && e.touches.length === 1) {
+                          const touch = e.touches[0];
+                          const deltaX = touch.clientX - swipeStartRef.current.x;
+                          const deltaY = touch.clientY - swipeStartRef.current.y;
+
+                          // 가로 이동이 세로 이동보다 크면 슬라이드로 판단
+                          if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+                            isSwipingRef.current = true;
+                            swipeDistanceRef.current = { x: deltaX, y: deltaY };
+                            // 가로 스와이프 중에는 세로 스크롤 방지
+                            if (e.cancelable) {
+                              e.preventDefault();
+                            }
+                          }
                         }
                         // 터치가 많이 움직였으면 롱프레스가 아님 (스크롤)
                         if (modalTouchStartPosRef.current && e.touches.length === 1) {
@@ -397,9 +424,33 @@ const GallerySectionComponent: React.FC = () => {
                         }
                       }}
                       onTouchEnd={(e) => {
+                        // 슬라이드 제스처 처리
+                        if (isSwipingRef.current && swipeStartRef.current) {
+                          const minSwipeDistance = 50; // 최소 스와이프 거리
+                          const deltaX = swipeDistanceRef.current.x;
+
+                          if (Math.abs(deltaX) > minSwipeDistance && !isNavigating) {
+                            if (deltaX > 0) {
+                              // 오른쪽으로 스와이프 (이전 이미지)
+                              goToPrev(e);
+                            } else {
+                              // 왼쪽으로 스와이프 (다음 이미지)
+                              goToNext(e);
+                            }
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }
+
+                          // 슬라이드 상태 초기화
+                          isSwipingRef.current = false;
+                          swipeStartRef.current = null;
+                          swipeDistanceRef.current = { x: 0, y: 0 };
+                        }
+
                         // 롱프레스 감지 (500ms 이상 누르고 있고, 움직임이 적은 경우)
                         const touchDuration = Date.now() - modalTouchStartTimeRef.current;
-                        const isLongPress = touchDuration > 500 && modalTouchStartPosRef.current !== null;
+                        const isLongPress =
+                          touchDuration > 500 && modalTouchStartPosRef.current !== null && !isSwipingRef.current;
 
                         if (isLongPress) {
                           // 롱프레스인 경우에만 차단
@@ -417,6 +468,57 @@ const GallerySectionComponent: React.FC = () => {
                           e.preventDefault();
                           e.stopPropagation();
                         }
+                        // 마우스 드래그 시작 위치 기록 (왼쪽 버튼만)
+                        if (e.button === 0) {
+                          swipeStartRef.current = {
+                            x: e.clientX,
+                            y: e.clientY,
+                          };
+                          swipeDistanceRef.current = { x: 0, y: 0 };
+                          isSwipingRef.current = false;
+                        }
+                      }}
+                      onMouseMove={(e) => {
+                        if (swipeStartRef.current && e.buttons === 1) {
+                          const deltaX = e.clientX - swipeStartRef.current.x;
+                          const deltaY = e.clientY - swipeStartRef.current.y;
+
+                          // 가로 이동이 세로 이동보다 크면 슬라이드로 판단
+                          if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+                            isSwipingRef.current = true;
+                            swipeDistanceRef.current = { x: deltaX, y: deltaY };
+                          }
+                        }
+                      }}
+                      onMouseUp={(e) => {
+                        // 슬라이드 제스처 처리
+                        if (isSwipingRef.current && swipeStartRef.current) {
+                          const minSwipeDistance = 50; // 최소 스와이프 거리
+                          const deltaX = swipeDistanceRef.current.x;
+
+                          if (Math.abs(deltaX) > minSwipeDistance && !isNavigating) {
+                            if (deltaX > 0) {
+                              // 오른쪽으로 드래그 (이전 이미지)
+                              goToPrev();
+                            } else {
+                              // 왼쪽으로 드래그 (다음 이미지)
+                              goToNext();
+                            }
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }
+
+                          // 슬라이드 상태 초기화
+                          isSwipingRef.current = false;
+                          swipeStartRef.current = null;
+                          swipeDistanceRef.current = { x: 0, y: 0 };
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        // 마우스가 영역을 벗어나면 슬라이드 취소
+                        isSwipingRef.current = false;
+                        swipeStartRef.current = null;
+                        swipeDistanceRef.current = { x: 0, y: 0 };
                       }}
                       style={{
                         touchAction: "pan-y", // 세로 스크롤만 허용
