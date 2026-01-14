@@ -11,26 +11,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// 임시 연락처 (나중에 실제 연락처로 교체)
 const CONTACTS = {
   groom: {
-    name: "김재권",
-    phone: "010-1111-2222",
+    name: import.meta.env.VITE_GROOM_NAME,
+    phone: import.meta.env.VITE_GROOM_PHONE,
     mother: {
-      name: "이현숙",
-      phone: "010-2345-6789",
+      name: import.meta.env.VITE_GROOM_MOTHER_NAME,
+      phone: import.meta.env.VITE_GROOM_MOTHER_PHONE,
     },
   },
   bride: {
-    name: "김지현",
-    phone: "010-3333-4444",
+    name: import.meta.env.VITE_BRIDE_NAME,
+    phone: import.meta.env.VITE_BRIDE_PHONE,
     father: {
-      name: "김용태",
-      phone: "010-3456-7890",
+      name: import.meta.env.VITE_BRIDE_FATHER_NAME,
+      phone: import.meta.env.VITE_BRIDE_FATHER_PHONE,
     },
     mother: {
-      name: "유금주",
-      phone: "010-4567-8901",
+      name: import.meta.env.VITE_BRIDE_MOTHER_NAME,
+      phone: import.meta.env.VITE_BRIDE_MOTHER_PHONE,
     },
   },
 };
@@ -55,13 +54,13 @@ export const ContactSection: React.FC = () => {
             <p className="leading-relaxed flex justify-between items-center">
               <span className="flex items-center gap-1">
                 <img src={flowerIcon} alt="flower" className="w-4 h-4" />
-                김중겸 • 이현숙
+                {import.meta.env.VITE_GROOM_FATHER_NAME} • {import.meta.env.VITE_GROOM_MOTHER_NAME}
               </span>
               <span>의 아들</span>
             </p>
             <p className=" mt-1 flex justify-between items-center">
               <span>신랑</span>
-              <span className=" text-black">재권</span>
+              <span className=" text-black">{import.meta.env.VITE_GROOM_SHORT_NAME}</span>
             </p>
           </div>
         </div>
@@ -73,12 +72,14 @@ export const ContactSection: React.FC = () => {
         <div className="flex items-start justify-between gap-4 text-gray-700">
           <div className="flex-1 text-left">
             <p className="leading-relaxed flex justify-between items-center">
-              <span>김용태 • 유금주</span>
+              <span>
+                {import.meta.env.VITE_BRIDE_FATHER_NAME} • {import.meta.env.VITE_BRIDE_MOTHER_NAME}
+              </span>
               <span>의 딸</span>
             </p>
             <p className="mt-1 flex justify-between items-center">
               <span>신부</span>
-              <span className="text-black">지현</span>
+              <span className="text-black">{import.meta.env.VITE_BRIDE_SHORT_NAME}</span>
             </p>
           </div>
         </div>
