@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { XIcon } from "lucide-react";
+// 원본 이미지 (모달용)
 import image4 from "@/assets/KJK_0635.webp";
 import image6 from "@/assets/KJK_0853_1.webp";
 import image2 from "@/assets/KJK_0984.webp";
@@ -13,10 +14,24 @@ import image10 from "@/assets/KJK_2160.webp";
 import image11 from "@/assets/KJK_2307.webp";
 import image12 from "@/assets/KJK_2589.webp";
 import image13 from "@/assets/KJK_3207.webp";
+// 썸네일 이미지 (갤러리 그리드용)
+import thumb4 from "@/assets/thumbnails/KJK_0635.webp";
+import thumb6 from "@/assets/thumbnails/KJK_0853_1.webp";
+import thumb2 from "@/assets/thumbnails/KJK_0984.webp";
+import thumb3 from "@/assets/thumbnails/KJK_1138.webp";
+import thumb5 from "@/assets/thumbnails/KJK_1179.webp";
+import thumb1 from "@/assets/thumbnails/KJK_1382.webp";
+import thumb7 from "@/assets/thumbnails/KJK_1703.webp";
+import thumb8 from "@/assets/thumbnails/KJK_1802.webp";
+import thumb9 from "@/assets/thumbnails/KJK_1911.webp";
+import thumb10 from "@/assets/thumbnails/KJK_2160.webp";
+import thumb11 from "@/assets/thumbnails/KJK_2307.webp";
+import thumb12 from "@/assets/thumbnails/KJK_2589.webp";
+import thumb13 from "@/assets/thumbnails/KJK_3207.webp";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-// 갤러리 이미지 배열
-const galleryImages = [
+// 원본 이미지 배열 (모달용)
+const originalImages = [
   image1,
   image2,
   image3,
@@ -30,6 +45,23 @@ const galleryImages = [
   image11,
   image12,
   image13,
+];
+
+// 썸네일 이미지 배열 (갤러리 그리드용)
+const thumbnailImages = [
+  thumb1,
+  thumb2,
+  thumb3,
+  thumb4,
+  thumb5,
+  thumb6,
+  thumb7,
+  thumb8,
+  thumb9,
+  thumb10,
+  thumb11,
+  thumb12,
+  thumb13,
 ];
 
 const GalleryImageItem: React.FC<{
@@ -138,9 +170,6 @@ const GalleryImageItem: React.FC<{
       onContextMenu={handleContextMenu}
       onMouseDown={handleMouseDown}
       style={{
-        contain: "strict",
-        transform: "translateZ(0)",
-        isolation: "isolate",
         WebkitUserSelect: "none",
         userSelect: "none",
         WebkitTouchCallout: "none",
@@ -169,7 +198,8 @@ const GalleryImageItem: React.FC<{
 });
 
 const GallerySectionComponent: React.FC = () => {
-  const images = galleryImages;
+  const thumbnails = thumbnailImages;
+  const originals = originalImages;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -202,7 +232,7 @@ const GallerySectionComponent: React.FC = () => {
 
       setIsNavigating(true);
 
-      if (selectedIndex !== null && selectedIndex < images.length - 1) {
+      if (selectedIndex !== null && selectedIndex < originals.length - 1) {
         setSelectedIndex(selectedIndex + 1);
       }
 
@@ -214,7 +244,7 @@ const GallerySectionComponent: React.FC = () => {
         setIsNavigating(false);
       }, 200);
     },
-    [selectedIndex, images.length, isNavigating]
+    [selectedIndex, originals.length, isNavigating]
   );
 
   const goToPrev = useCallback(
@@ -242,7 +272,7 @@ const GallerySectionComponent: React.FC = () => {
         setIsNavigating(false);
       }, 200);
     },
-    [selectedIndex, images.length, isNavigating]
+    [selectedIndex, originals.length, isNavigating]
   );
 
   // cleanup timeout on unmount
@@ -272,15 +302,15 @@ const GallerySectionComponent: React.FC = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedIndex, images.length, goToPrev, goToNext, isNavigating, closeModal]);
+  }, [selectedIndex, originals.length, goToPrev, goToNext, isNavigating, closeModal]);
 
   // 이미지 카운트 메모이제이션
   const imageCountText = useMemo(() => {
     if (selectedIndex === null) return "";
-    return `${selectedIndex + 1} / ${images.length}`;
-  }, [selectedIndex, images.length]);
+    return `${selectedIndex + 1} / ${originals.length}`;
+  }, [selectedIndex, originals.length]);
 
-  if (images.length === 0) {
+  if (originals.length === 0) {
     return null;
   }
 
@@ -296,8 +326,8 @@ const GallerySectionComponent: React.FC = () => {
             contain: "layout style paint",
           }}
         >
-          {images.map((image, index) => (
-            <GalleryImageItem key={index} image={image} index={index} onOpenModal={openModal} />
+          {thumbnails.map((thumbnail, index) => (
+            <GalleryImageItem key={index} image={thumbnail} index={index} onOpenModal={openModal} />
           ))}
         </div>
       </section>
@@ -373,7 +403,7 @@ const GallerySectionComponent: React.FC = () => {
                   <div className="relative w-full h-full flex items-center justify-center">
                     <img
                       ref={imageRef}
-                      src={images[selectedIndex]}
+                      src={originals[selectedIndex]}
                       alt={`Gallery image ${selectedIndex + 1}`}
                       className="max-w-full max-h-full object-contain select-none pointer-events-none"
                       style={{
@@ -606,7 +636,7 @@ const GallerySectionComponent: React.FC = () => {
               )}
 
               {/* 다음 버튼 */}
-              {selectedIndex !== null && selectedIndex < images.length - 1 && (
+              {selectedIndex !== null && selectedIndex < originals.length - 1 && (
                 <button
                   type="button"
                   onClick={(e) => {

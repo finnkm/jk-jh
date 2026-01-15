@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist",
+    "generate:thumbnails": "node scripts/generate-thumbnails.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
