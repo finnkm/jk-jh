@@ -321,7 +321,7 @@ const GallerySectionComponent: React.FC = () => {
           <h2 className="font-default-bold text-xl">Gallery</h2>
         </div>
         <div
-          className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-2xl px-4"
+          className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-2xl"
           style={{
             contain: "layout style paint",
           }}
