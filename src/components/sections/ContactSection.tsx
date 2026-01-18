@@ -46,7 +46,7 @@ export const ContactSection: React.FC = () => {
   };
 
   return (
-    <section className="w-full flex items-center justify-center flex-col gap-6">
+    <section className="w-full flex items-center justify-center flex-col gap-6 px-4">
       <div className="w-full max-w-2xl">
         {/* 신랑 */}
         <div className="flex items-start justify-between gap-4 mb-6 text-gray-700">

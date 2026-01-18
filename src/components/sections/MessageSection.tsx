@@ -99,81 +99,107 @@ export const MessageSection: React.FC = () => {
 
   return (
     <>
-      <section className="w-full flex items-center justify-center bg-primary/5 flex-col p-4 gap-2">
-        축하 메시지를 남겨보세요
-        <div className="flex flex-col gap-2 w-full">
-          <div className="gap-2 flex-row flex">
-            {loading ? (
-              <Skeleton className="h-9 w-full" />
-            ) : (
-              <Input
-                id="name"
-                type="text"
-                placeholder="이름"
-                required
-                maxLength={20}
-                value={payload.name}
-                onChange={(e) => setPayload({ ...payload, name: e.target.value })}
-                onKeyDown={preventSpaceInput}
-              />
-            )}
-            {loading ? (
-              <Skeleton className="h-9 w-full" />
-            ) : (
-              <Input
-                id="password"
-                type="password"
-                placeholder="비밀번호"
-                required
-                maxLength={20}
-                value={payload.password}
-                onChange={(e) => setPayload({ ...payload, password: e.target.value.replace(/[^a-zA-Z0-9]/g, "") })}
-              />
-            )}
+      <section className="w-full flex items-center justify-center bg-primary/5 flex-col gap-6 py-6">
+        <div className="flex flex-col items-center gap-2 mb-2">
+          <h2 className="font-default-bold text-xl">Message</h2>
+        </div>
+        <div className="w-full max-w-2xl px-4">
+          {/* 메시지 작성 폼 */}
+          <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-100 mb-6">
+            <p className="text-base font-medium text-gray-800 mb-4 text-center">축하 메시지를 남겨보세요.</p>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+              <div className="flex gap-2">
+                {loading ? (
+                  <Skeleton className="h-9 flex-1" />
+                ) : (
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="이름"
+                    required
+                    maxLength={20}
+                    value={payload.name}
+                    onChange={(e) => setPayload({ ...payload, name: e.target.value })}
+                    onKeyDown={preventSpaceInput}
+                    className="flex-1"
+                  />
+                )}
+                {loading ? (
+                  <Skeleton className="h-9 flex-1" />
+                ) : (
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="비밀번호"
+                    required
+                    maxLength={20}
+                    value={payload.password}
+                    onChange={(e) => setPayload({ ...payload, password: e.target.value.replace(/[^a-zA-Z0-9]/g, "") })}
+                    className="flex-1"
+                  />
+                )}
+              </div>
+
+              {loading ? (
+                <Skeleton className="h-20 w-full" />
+              ) : (
+                <Textarea
+                  id="message"
+                  placeholder="메시지를 입력하세요."
+                  required
+                  maxLength={50}
+                  value={payload.content}
+                  onChange={(e) => setPayload({ ...payload, content: e.target.value })}
+                  className="min-h-20"
+                />
+              )}
+              <p className="text-muted-foreground text-xs text-right">
+                [{payload.content.length}/50] 최대 50자까지 입력할 수 있습니다.
+              </p>
+              <Button type="submit" className="w-full" disabled={disabled}>
+                {loading && <Spinner />}
+                축하 메시지 남기기
+              </Button>
+            </form>
           </div>
 
-          {loading ? (
-            <Skeleton className="h-16 w-full" />
-          ) : (
-            <Textarea
-              id="message"
-              placeholder="메시지를 입력하세요."
-              required
-              maxLength={50}
-              value={payload.content}
-              onChange={(e) => setPayload({ ...payload, content: e.target.value })}
-            />
-          )}
-          <p className="text-muted-foreground text-sm">
-            [{payload.content.length}/50] 최대 50자까지 입력할 수 있습니다.
-          </p>
-          <Button type="submit" className="w-full" disabled={disabled} onClick={handleSubmit}>
-            {loading && <Spinner />}
-            축하 메시지 남기기
-          </Button>
-        </div>
-        {messages.length > 0 && (
-          <div className="w-full flex flex-col gap-2">
-            <div className="w-full flex items-center justify-center">
-              <p className="py-5">💐 축하 메시지 💐</p>
+          {/* 메시지 리스트 */}
+          {messages.length > 0 && (
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-center py-2">
+                <p className="text-base font-medium text-gray-700">💐 축하 메시지 💐</p>
+              </div>
+              <div className="flex flex-col gap-3">
+                {messages.map((message: MessageResponse) => (
+                  <div
+                    key={message.id}
+                    className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <p className="font-medium text-gray-800">{message.name}</p>
+                          <span className="text-xs text-gray-400">
+                            {format(new Date(message.createdAt), "yyyy-MM-dd")}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-700 leading-relaxed">{message.content}</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setDeleteMessageAction(message.id)}
+                        className="shrink-0"
+                      >
+                        삭제
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            {messages.map((message: MessageResponse) => (
-              <Item key={message.id} variant="outline">
-                <ItemContent>
-                  <ItemTitle>
-                    {message.name} ({format(new Date(message.createdAt), "yyyy-MM-dd")})
-                  </ItemTitle>
-                  <ItemDescription>{message.content}</ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <Button variant="outline" size="sm" onClick={() => setDeleteMessageAction(message.id)}>
-                    삭제
-                  </Button>
-                </ItemActions>
-              </Item>
-            ))}
-          </div>
-        )}
+          )}
+        </div>
       </section>
       {deleteMessageAction && (
         <Dialog open={Boolean(deleteMessageAction)} onOpenChange={() => setDeleteMessageAction(undefined)}>

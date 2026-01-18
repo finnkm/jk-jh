@@ -35,7 +35,7 @@ export const GiftSection: React.FC = () => {
   };
 
   return (
-    <section className="w-full flex items-center justify-center flex-col gap-6">
+    <section className="w-full flex items-center justify-center flex-col gap-6 px-4">
       <div className="flex flex-col items-center gap-2 mb-4">
         <h2 className="font-default-bold text-xl">Contribution</h2>
       </div>

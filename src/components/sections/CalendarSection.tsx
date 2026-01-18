@@ -10,7 +10,7 @@ const DAYS_LEFT = differenceInDays(FIXED_DATE, new Date());
 
 export const CalendarSection: React.FC = () => {
   return (
-    <section className="w-full flex items-center justify-center flex-col gap-7 bg-primary/5 py-10">
+    <section className="w-full flex items-center justify-center flex-col gap-6 bg-primary/5 py-6 px-4">
       <div className="flex flex-col items-center gap-2 mb-2">
         <h2 className="font-default-bold text-xl">Wedding Day</h2>
       </div>
