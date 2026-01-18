@@ -9,7 +9,7 @@ export const LocationSection: React.FC = () => {
       </div>
       <div className="flex flex-col items-center gap-3 text-center max-w-md">
         <div className="flex flex-col items-center gap-1">
-          <p className="text-base font-medium">잠실 더 베네치아 루터회관 3층</p>
+          <p className="text-base font-medium">{import.meta.env.VITE_LOCATION_NAME}</p>
           <p className="text-sm text-gray-600">{import.meta.env.VITE_ADDRESS}</p>
         </div>
       </div>

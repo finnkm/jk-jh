@@ -6,6 +6,7 @@ import { CalendarSection } from "./components/sections/CalendarSection";
 import { ContactSection } from "./components/sections/ContactSection";
 import { FooterSection } from "./components/sections/FooterSection";
 import { GallerySection } from "./components/sections/GallerySection";
+import { GiftSection } from "./components/sections/GiftSection";
 import { GreetingSection } from "./components/sections/GreetingSection";
 import { HeaderSection } from "./components/sections/HeaderSection";
 import { ImageUploadSection } from "./components/sections/ImageUploadSection";
@@ -40,6 +41,7 @@ const App: React.FC = () => {
             <ContactSection />
             <GallerySection />
             <LocationSection />
+            <GiftSection />
             <MessageSection />
             <ImageUploadSection />
             <FooterSection />

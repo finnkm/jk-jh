@@ -16,7 +16,6 @@ export const CalendarSection: React.FC = () => {
       </div>
       <div className="flex flex-col items-center gap-2">
         <p>2026년 4월 18일 토요일 | 오후 4시</p>
-        <p>잠실 더 베네치아 루터회관 3층</p>
       </div>
       <div className="h-px w-4/5 bg-gray-300" />
       <style>{`
