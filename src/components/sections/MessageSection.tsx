@@ -11,7 +11,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -99,13 +98,13 @@ export const MessageSection: React.FC = () => {
 
   return (
     <>
-      <section className="w-full flex items-center justify-center bg-primary/5 flex-col gap-6 py-6">
+      <section className="w-full flex items-center justify-center bg-primary/5 flex-col gap-6 py-6 px-4">
         <div className="flex flex-col items-center gap-2 mb-2">
           <h2 className="font-default-bold text-xl">Message</h2>
         </div>
-        <div className="w-full max-w-2xl px-4">
+        <div className="w-full max-w-2xl">
           {/* 메시지 작성 폼 */}
-          <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-100 mb-6">
+          <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-100">
             <p className="text-base font-medium text-gray-800 mb-4 text-center">축하 메시지를 남겨보세요.</p>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <div className="flex gap-2">
@@ -166,7 +165,7 @@ export const MessageSection: React.FC = () => {
           {/* 메시지 리스트 */}
           {messages.length > 0 && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-center py-2">
+              <div className="flex items-center justify-center py-2 mt-4">
                 <p className="text-base font-medium text-gray-700">💐 축하 메시지 💐</p>
               </div>
               <div className="flex flex-col gap-3">
