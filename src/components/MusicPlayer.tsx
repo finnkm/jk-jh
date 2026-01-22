@@ -1,74 +1,72 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Howl, Howler } from "howler";
 import { Volume2, VolumeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import musicFile from "/untitled.wav";
 
+// iOS 무음 모드 및 디바이스 음소거 상태를 존중하도록 설정
+// Web Audio API 대신 HTML5 Audio만 사용
+Howler.autoUnlock = false;
+
 export const MusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const soundRef = useRef<Howl | null>(null);
   const isInitializedRef = useRef(false);
 
   useEffect(() => {
-    if (isInitializedRef.current || audioRef.current) {
+    if (isInitializedRef.current || soundRef.current) {
       return;
     }
 
-    // 순수 HTML5 Audio 사용 (iOS 무음 모드 존중)
-    const audio = new Audio(musicFile);
-    audio.loop = true;
-    audio.volume = 0.3;
-    audio.preload = "auto";
+    const sound = new Howl({
+      src: [musicFile],
+      loop: true,
+      volume: 0.3,
+      preload: true,
+      html5: true, // HTML5 Audio 강제 사용 (무음 모드 존중)
+      onload: () => {
+        setTimeout(() => {
+          if (soundRef.current && !soundRef.current.playing()) {
+            soundRef.current.play();
+          }
+        }, 100);
+      },
+      onplay: () => {
+        setIsPlaying(true);
+      },
+      onpause: () => {
+        setIsPlaying(false);
+      },
+      onstop: () => {
+        setIsPlaying(false);
+      },
+      onplayerror: (_id, error) => {
+        console.warn("Music player error:", error);
+        setIsPlaying(false);
+      },
+    });
 
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-    const handleEnded = () => setIsPlaying(false);
-    const handleError = () => {
-      console.warn("Music player error");
-      setIsPlaying(false);
-    };
-
-    audio.addEventListener("play", handlePlay);
-    audio.addEventListener("pause", handlePause);
-    audio.addEventListener("ended", handleEnded);
-    audio.addEventListener("error", handleError);
-
-    audioRef.current = audio;
+    soundRef.current = sound;
     isInitializedRef.current = true;
 
-    // 자동 재생 시도
-    const tryAutoPlay = async () => {
-      try {
-        await audio.play();
-      } catch (error) {
-        // 자동 재생 실패 시 무시 (사용자가 버튼을 클릭해야 재생됨)
-        console.log("Auto-play prevented:", error);
-      }
-    };
-    tryAutoPlay();
-
     return () => {
-      audio.removeEventListener("play", handlePlay);
-      audio.removeEventListener("pause", handlePause);
-      audio.removeEventListener("ended", handleEnded);
-      audio.removeEventListener("error", handleError);
-      audio.pause();
-      audio.src = "";
-      audioRef.current = null;
+      if (sound) {
+        sound.stop();
+        sound.unload();
+      }
+      soundRef.current = null;
       isInitializedRef.current = false;
     };
   }, []);
 
   const handleToggle = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const sound = soundRef.current;
+    if (!sound) return;
 
-    if (audio.paused) {
-      audio.play().catch((error) => {
-        console.warn("Play failed:", error);
-        setIsPlaying(false);
-      });
+    if (sound.playing()) {
+      sound.pause();
     } else {
-      audio.pause();
+      sound.play();
     }
   }, []);
 
