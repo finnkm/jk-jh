@@ -27,7 +27,7 @@ export const InvitationSection: React.FC = () => {
         <p className="text-sm text-gray-600 leading-relaxed font-light italic">
           새로운 인연의 시작에
           <br />
-          귀한 걸음을 부탁드립니다.
+          소중한 분들을 모시고자 합니다.
         </p>
       </div>
     </section>

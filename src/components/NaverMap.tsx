@@ -100,7 +100,13 @@ export const NaverMap: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col items-center gap-2">
-      <div ref={naverMapRef} className="w-full h-80" />
+      <div
+        ref={naverMapRef}
+        className="w-full h-80"
+        style={{
+          touchAction: "pan-x pan-y pinch-zoom",
+        }}
+      />
       <Button variant="outline" className="w-full" onClick={() => setIsDrawerOpen(true)}>
         네비게이션 & 주소복사
       </Button>
