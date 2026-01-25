@@ -18,6 +18,11 @@ const ACCOUNTS = {
     name: import.meta.env.VITE_BRIDE_NAME,
     bank: import.meta.env.VITE_BRIDE_BANK,
     account: import.meta.env.VITE_BRIDE_ACCOUNT,
+    mother: {
+      name: import.meta.env.VITE_BRIDE_MOTHER_NAME,
+      bank: import.meta.env.VITE_BRIDE_MOTHER_BANK,
+      account: import.meta.env.VITE_BRIDE_MOTHER_ACCOUNT,
+    },
   },
 };
 
@@ -85,7 +90,7 @@ export const GiftSection: React.FC = () => {
             <AccordionTrigger className="text-base">신부측에게</AccordionTrigger>
             <AccordionContent>
               <div className="flex flex-col gap-4 pt-2">
-                {[ACCOUNTS.bride].map((account) => (
+                {[ACCOUNTS.bride, ACCOUNTS.bride.mother].map((account) => (
                   <div key={account.name} className="flex flex-col gap-2">
                     <p className="text-sm font-medium text-gray-700">{account.name}</p>
                     <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md">

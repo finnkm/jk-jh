@@ -21,7 +21,7 @@ export const MusicPlayer: React.FC = () => {
     const sound = new Howl({
       src: [musicFile],
       loop: true,
-      volume: 0.3,
+      volume: 0.1,
       preload: true,
       html5: true, // HTML5 Audio 강제 사용 (무음 모드 존중)
       onload: () => {
