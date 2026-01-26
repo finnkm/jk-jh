@@ -3,53 +3,53 @@ import { XIcon } from "lucide-react";
 import image6 from "@/assets/6.webp"; // 6번
 import image7 from "@/assets/7.webp"; // 7번
 
-import image13 from "@/assets/13.webp"; // 13번
-import image2 from "@/assets/KJK_0635.webp"; // 2번
+import image13 from "@/assets/13-1.webp"; // 13번
+import image2 from "@/assets/KJK_0635-1.webp"; // 2번
 
-import image5 from "@/assets/KJK_0843.webp"; // 5번
-import image3 from "@/assets/KJK_0984.webp"; // 3번
+import image5 from "@/assets/KJK_0843-1.webp"; // 5번
+import image3 from "@/assets/KJK_0984-1.webp"; // 3번
 import image4 from "@/assets/KJK_1138.webp"; // 4번
 
 // 원본 이미지 (모달용)
-import image1 from "@/assets/KJK_1179.webp"; // 1번
+import image1 from "@/assets/KJK_1179-1.webp"; // 1번
 
-import image9 from "@/assets/KJK_1382.webp"; // 9번
-import image8 from "@/assets/KJK_1703.webp"; // 8번
+import image9 from "@/assets/KJK_1382-1.webp"; // 9번
+import image8 from "@/assets/KJK_1703-1.webp"; // 8번
 
-import image10 from "@/assets/KJK_1802.webp"; // 10번
+import image10 from "@/assets/KJK_1802-1.webp"; // 10번
 
-import image14 from "@/assets/KJK_1911.webp"; // 14번
-import image11 from "@/assets/KJK_2158.webp"; // 11번
-import image12 from "@/assets/KJK_2160.webp"; // 12번
+import image14 from "@/assets/KJK_1911-1.webp"; // 14번
+import image11 from "@/assets/KJK_2158-1.webp"; // 11번
+import image12 from "@/assets/KJK_2160-1.webp"; // 12번
 
-import image15 from "@/assets/KJK_2589.webp"; // 15번
-import image16 from "@/assets/KJK_2842.webp"; // 16번
+import image15 from "@/assets/KJK_2589-1.webp"; // 15번
+import image16 from "@/assets/KJK_2842-1.webp"; // 16번
 import image17 from "@/assets/KJK_3207.webp"; // 17번
 
 import thumb6 from "@/assets/thumbnails/6.webp"; // 6번
 import thumb7 from "@/assets/thumbnails/7.webp"; // 7번
+import thumb13 from "@/assets/thumbnails/13-1.webp"; // 13번
 
-import thumb13 from "@/assets/thumbnails/13.webp"; // 13번
-import thumb2 from "@/assets/thumbnails/KJK_0635.webp"; // 2번
+import thumb2 from "@/assets/thumbnails/KJK_0635-1.webp"; // 2번
 
-import thumb5 from "@/assets/thumbnails/KJK_0843.webp"; // 5번
-import thumb3 from "@/assets/thumbnails/KJK_0984.webp"; // 3번
+import thumb5 from "@/assets/thumbnails/KJK_0843-1.webp"; // 5번
+import thumb3 from "@/assets/thumbnails/KJK_0984-1.webp"; // 3번
 import thumb4 from "@/assets/thumbnails/KJK_1138.webp"; // 4번
 
 // 썸네일 이미지 (갤러리 그리드용)
-import thumb1 from "@/assets/thumbnails/KJK_1179.webp"; // 1번
+import thumb1 from "@/assets/thumbnails/KJK_1179-1.webp"; // 1번
 
-import thumb9 from "@/assets/thumbnails/KJK_1382.webp"; // 9번
-import thumb8 from "@/assets/thumbnails/KJK_1703.webp"; // 8번
+import thumb9 from "@/assets/thumbnails/KJK_1382-1.webp"; // 9번
+import thumb8 from "@/assets/thumbnails/KJK_1703-1.webp"; // 8번
 
-import thumb10 from "@/assets/thumbnails/KJK_1802.webp"; // 10번
+import thumb10 from "@/assets/thumbnails/KJK_1802-1.webp"; // 10번
 
-import thumb14 from "@/assets/thumbnails/KJK_1911.webp"; // 14번
-import thumb11 from "@/assets/thumbnails/KJK_2158.webp"; // 11번
-import thumb12 from "@/assets/thumbnails/KJK_2160.webp"; // 12번
+import thumb14 from "@/assets/thumbnails/KJK_1911-1.webp"; // 14번
+import thumb11 from "@/assets/thumbnails/KJK_2158-1.webp"; // 11번
+import thumb12 from "@/assets/thumbnails/KJK_2160-1.webp"; // 12번
 
-import thumb15 from "@/assets/thumbnails/KJK_2589.webp"; // 15번
-import thumb16 from "@/assets/thumbnails/KJK_2842.webp"; // 16번
+import thumb15 from "@/assets/thumbnails/KJK_2589-1.webp"; // 15번
+import thumb16 from "@/assets/thumbnails/KJK_2842-1.webp"; // 16번
 import thumb17 from "@/assets/thumbnails/KJK_3207.webp"; // 17번
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 

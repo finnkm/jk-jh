@@ -9,7 +9,7 @@ const THUMBNAIL_WIDTH = 400; // 썸네일 너비 (갤러리 그리드용)
 const THUMBNAIL_QUALITY = 80;
 
 // 여기에 변경하고 싶은 이미지 접두사를 추가합니다.
-const GALLERY_IMAGE_PREFIXES = ["KJK_2842"];
+const GALLERY_IMAGE_PREFIXES = ["KJK_2842-1"];
 
 async function generateThumbnails() {
   // 썸네일 디렉토리 생성
