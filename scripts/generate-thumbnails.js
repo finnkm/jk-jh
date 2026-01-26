@@ -8,21 +8,8 @@ const THUMBNAILS_DIR = "./src/assets/thumbnails";
 const THUMBNAIL_WIDTH = 400; // 썸네일 너비 (갤러리 그리드용)
 const THUMBNAIL_QUALITY = 80;
 
-const GALLERY_IMAGE_PREFIXES = [
-  "KJK_0635",
-  "KJK_0853_1",
-  "KJK_0984",
-  "KJK_1138",
-  "KJK_1179",
-  "KJK_1382",
-  "KJK_1703",
-  "KJK_1802",
-  "KJK_1911",
-  "KJK_2160",
-  "KJK_2307",
-  "KJK_2589",
-  "KJK_3207",
-];
+// 여기에 변경하고 싶은 이미지 접두사를 추가합니다.
+const GALLERY_IMAGE_PREFIXES = ["KJK_2842"];
 
 async function generateThumbnails() {
   // 썸네일 디렉토리 생성
