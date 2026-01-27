@@ -10,7 +10,7 @@ export const InvitationSection: React.FC = () => {
             <span className="text-primary font-medium text-lg">지</span>금처럼 서로를 아끼며,
           </p>
           <p className="font-light">
-            <span className="text-primary font-medium text-lg">현</span>실보다 더 따뜻한 사랑을 꿈꿔왔습니다.
+            <span className="text-primary font-medium text-lg">현</span>재와 미래를 함께 그리고 싶어졌습니다.
           </p>
           <p className="font-light">
             <span className="text-primary font-medium text-lg">재</span>밌는 순간을 함께하고,

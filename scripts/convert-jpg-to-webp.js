@@ -7,7 +7,7 @@ const ASSETS_DIR = "./src/assets";
 const WEBP_QUALITY = 85;
 
 // 여기에 변경하고 싶은 이미지 접두사를 추가합니다.
-const GALLERY_IMAGE_PREFIXES = ["KJK_0853-1"];
+const GALLERY_IMAGE_PREFIXES = ["KJK_0984-2"];
 
 async function convertJpgToWebp() {
   // assets 디렉토리에서 JPG 파일 찾기
