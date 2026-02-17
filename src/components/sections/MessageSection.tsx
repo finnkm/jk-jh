@@ -51,7 +51,7 @@ export const MessageSection: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
-  const disabled = loading || !payload.name || !payload.content || !payload.password;
+  const disabled = loading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

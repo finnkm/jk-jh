@@ -16,6 +16,8 @@ import { Spinner } from "@/components/ui/spinner";
 import useDiscordWebhook from "@/hooks/useDiscordWebhook";
 import { usefirebaseStorage } from "@/hooks/usefirebaseStorage";
 
+const WEDDING_DATE = new Date(import.meta.env.VITE_WEDDING_DATE);
+
 export const ImageUploadSection: React.FC = () => {
   const [isUploadingState, setIsUploadingState] = useState(false);
   const [uploadedSize, setUploadedSize] = useState(0);
@@ -25,6 +27,11 @@ export const ImageUploadSection: React.FC = () => {
   const { send } = useDiscordWebhook();
 
   const handleButtonClick = () => {
+    const now = new Date();
+    if (now < WEDDING_DATE) {
+      toast.error("사진은 결혼식 당일부터 업로드할 수 있어요.");
+      return;
+    }
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
