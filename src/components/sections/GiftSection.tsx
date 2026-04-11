@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Check, Copy } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 
 const ACCOUNTS = {
@@ -52,81 +51,75 @@ export const GiftSection: React.FC = () => {
         </p>
       </div>
       <div className="w-full max-w-2xl flex flex-col gap-3">
-        <Accordion type="single" collapsible className="w-full flex flex-col gap-3">
-          {/* 신랑측 */}
-          <AccordionItem value="groom" className="border border-blue-100 rounded-xl overflow-hidden shadow-sm">
-            <AccordionTrigger className="px-4 py-3 bg-blue-50 hover:bg-blue-100 hover:no-underline text-base font-medium">
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-5 rounded-full bg-blue-300 inline-block" />
-                신랑측에게
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 pb-4">
-              <div className="flex flex-col gap-4 pt-3">
-                {[ACCOUNTS.groom, ACCOUNTS.groom.mother].map((account) => (
-                  <div key={account.name} className="flex flex-col gap-1.5">
-                    <p className="text-sm font-medium text-gray-700">{account.name}</p>
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                      <div className="flex-1">
-                        <p className="text-xs text-gray-400">{account.bank}</p>
-                        <p className="text-sm font-medium mt-0.5">{account.account}</p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleCopyAccount(account.account)}
-                        className="shrink-0"
-                      >
-                        {copiedAccount === account.account ? (
-                          <Check className="w-4 h-4 text-green-600" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                      </Button>
+        {/* 신랑측 */}
+        <div className="border border-blue-100 rounded-xl overflow-hidden shadow-sm">
+          <div className="px-4 py-3 bg-blue-50 flex items-center gap-2">
+            <span className="w-1.5 h-5 rounded-full bg-blue-300 inline-block" />
+            <span className="text-base font-medium">신랑측에게</span>
+          </div>
+          <div className="px-4 pb-4">
+            <div className="flex flex-col gap-4 pt-3">
+              {[ACCOUNTS.groom, ACCOUNTS.groom.mother].map((account) => (
+                <div key={account.name} className="flex flex-col gap-1.5">
+                  <p className="text-sm font-medium text-gray-700">{account.name}</p>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-400">{account.bank}</p>
+                      <p className="text-sm font-medium mt-0.5">{account.account}</p>
                     </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleCopyAccount(account.account)}
+                      className="shrink-0"
+                    >
+                      {copiedAccount === account.account ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </Button>
                   </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-          {/* 신부측 */}
-          <AccordionItem value="bride" className="border border-pink-100 rounded-xl overflow-hidden shadow-sm">
-            <AccordionTrigger className="px-4 py-3 bg-pink-50 hover:bg-pink-100 hover:no-underline text-base font-medium">
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-5 rounded-full bg-pink-300 inline-block" />
-                신부측에게
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 pb-4">
-              <div className="flex flex-col gap-4 pt-3">
-                {[ACCOUNTS.bride, ACCOUNTS.bride.mother].map((account) => (
-                  <div key={account.name} className="flex flex-col gap-1.5">
-                    <p className="text-sm font-medium text-gray-700">{account.name}</p>
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                      <div className="flex-1">
-                        <p className="text-xs text-gray-400">{account.bank}</p>
-                        <p className="text-sm font-medium mt-0.5">{account.account}</p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleCopyAccount(account.account)}
-                        className="shrink-0"
-                      >
-                        {copiedAccount === account.account ? (
-                          <Check className="w-4 h-4 text-green-600" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                      </Button>
+        {/* 신부측 */}
+        <div className="border border-pink-100 rounded-xl overflow-hidden shadow-sm">
+          <div className="px-4 py-3 bg-pink-50 flex items-center gap-2">
+            <span className="w-1.5 h-5 rounded-full bg-pink-300 inline-block" />
+            <span className="text-base font-medium">신부측에게</span>
+          </div>
+          <div className="px-4 pb-4">
+            <div className="flex flex-col gap-4 pt-3">
+              {[ACCOUNTS.bride, ACCOUNTS.bride.mother].map((account) => (
+                <div key={account.name} className="flex flex-col gap-1.5">
+                  <p className="text-sm font-medium text-gray-700">{account.name}</p>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-400">{account.bank}</p>
+                      <p className="text-sm font-medium mt-0.5">{account.account}</p>
                     </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleCopyAccount(account.account)}
+                      className="shrink-0"
+                    >
+                      {copiedAccount === account.account ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </Button>
                   </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
