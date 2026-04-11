@@ -107,7 +107,7 @@ export const NaverMap: React.FC = () => {
           touchAction: "pan-x pan-y pinch-zoom",
         }}
       />
-      <Button variant="outline" className="w-full" onClick={() => setIsDrawerOpen(true)}>
+      <Button className="w-full" onClick={() => setIsDrawerOpen(true)}>
         네비게이션 & 주소복사
       </Button>
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>

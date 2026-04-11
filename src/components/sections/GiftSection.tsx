@@ -51,20 +51,25 @@ export const GiftSection: React.FC = () => {
           너그러운 마음으로 양해 부탁드립니다.
         </p>
       </div>
-      <div className="w-full max-w-2xl">
-        <Accordion type="single" collapsible className="w-full">
+      <div className="w-full max-w-2xl flex flex-col gap-3">
+        <Accordion type="single" collapsible className="w-full flex flex-col gap-3">
           {/* 신랑측 */}
-          <AccordionItem value="groom">
-            <AccordionTrigger className="text-base">신랑측에게</AccordionTrigger>
-            <AccordionContent>
-              <div className="flex flex-col gap-4 pt-2">
+          <AccordionItem value="groom" className="border border-blue-100 rounded-xl overflow-hidden shadow-sm">
+            <AccordionTrigger className="px-4 py-3 bg-blue-50 hover:bg-blue-100 hover:no-underline text-base font-medium">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-5 rounded-full bg-blue-300 inline-block" />
+                신랑측에게
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4">
+              <div className="flex flex-col gap-4 pt-3">
                 {[ACCOUNTS.groom, ACCOUNTS.groom.mother].map((account) => (
-                  <div key={account.name} className="flex flex-col gap-2">
+                  <div key={account.name} className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium text-gray-700">{account.name}</p>
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md">
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
                       <div className="flex-1">
-                        <p className="text-xs text-gray-500">{account.bank}</p>
-                        <p className="text-sm font-medium mt-1">{account.account}</p>
+                        <p className="text-xs text-gray-400">{account.bank}</p>
+                        <p className="text-sm font-medium mt-0.5">{account.account}</p>
                       </div>
                       <Button
                         variant="outline"
@@ -86,17 +91,22 @@ export const GiftSection: React.FC = () => {
           </AccordionItem>
 
           {/* 신부측 */}
-          <AccordionItem value="bride">
-            <AccordionTrigger className="text-base">신부측에게</AccordionTrigger>
-            <AccordionContent>
-              <div className="flex flex-col gap-4 pt-2">
+          <AccordionItem value="bride" className="border border-pink-100 rounded-xl overflow-hidden shadow-sm">
+            <AccordionTrigger className="px-4 py-3 bg-pink-50 hover:bg-pink-100 hover:no-underline text-base font-medium">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-5 rounded-full bg-pink-300 inline-block" />
+                신부측에게
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4">
+              <div className="flex flex-col gap-4 pt-3">
                 {[ACCOUNTS.bride, ACCOUNTS.bride.mother].map((account) => (
-                  <div key={account.name} className="flex flex-col gap-2">
+                  <div key={account.name} className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium text-gray-700">{account.name}</p>
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md">
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
                       <div className="flex-1">
-                        <p className="text-xs text-gray-500">{account.bank}</p>
-                        <p className="text-sm font-medium mt-1">{account.account}</p>
+                        <p className="text-xs text-gray-400">{account.bank}</p>
+                        <p className="text-sm font-medium mt-0.5">{account.account}</p>
                       </div>
                       <Button
                         variant="outline"
