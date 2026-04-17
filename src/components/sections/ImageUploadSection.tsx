@@ -29,8 +29,12 @@ export const ImageUploadSection: React.FC = () => {
   const { send } = useDiscordWebhook();
 
   const handleButtonClick = () => {
-    if (DAYS_LEFT !== 0) {
+    if (DAYS_LEFT > 0) {
       toast.error("사진은 결혼식 당일부터 업로드할 수 있어요.");
+      return;
+    }
+    if (DAYS_LEFT < -1) {
+      toast.error("사진 업로드 기간이 종료되었어요.");
       return;
     }
     if (fileInputRef.current) {
