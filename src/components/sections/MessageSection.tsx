@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { format } from "date-fns";
+import { differenceInDays, format, startOfDay, startOfToday } from "date-fns";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,10 @@ import { Textarea } from "@/components/ui/textarea";
 import useDiscordWebhook from "@/hooks/useDiscordWebhook";
 import type { MessageRequest, MessageResponse } from "@/hooks/useFirebaseDatabase";
 import { useFirebaseDatabase } from "@/hooks/useFirebaseDatabase";
+
+const FIXED_DATE = new Date(import.meta.env.VITE_WEDDING_DATE);
+const DAYS_LEFT = differenceInDays(startOfDay(FIXED_DATE), startOfToday());
+const IS_AFTER_WEDDING = DAYS_LEFT < 0;
 
 const preventSpaceInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.key === " ") {
@@ -51,12 +55,10 @@ export const MessageSection: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
-  const disabled = loading;
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (disabled) return;
+    if (loading) return;
 
     setLoading(true);
 
@@ -99,12 +101,14 @@ export const MessageSection: React.FC = () => {
   return (
     <>
       <section className="w-full flex items-center justify-center bg-primary/5 flex-col gap-6 py-6 px-4">
-        <div className="flex flex-col items-center gap-2 mb-2">
+        <div className={`flex flex-col items-center gap-2 mb-2 ${IS_AFTER_WEDDING ? "" : "hidden"}`}>
           <h2 className="font-default-bold text-xl">Message</h2>
         </div>
         <div className="w-full max-w-2xl">
           {/* 메시지 작성 폼 */}
-          <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-100">
+          <div
+            className={`bg-white rounded-lg p-5 shadow-sm border border-gray-100 ${IS_AFTER_WEDDING ? "" : "hidden"}`}
+          >
             <p className="text-base font-medium text-gray-800 mb-4 text-center">축하 메시지를 남겨보세요.</p>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <div className="flex gap-2">
@@ -155,7 +159,7 @@ export const MessageSection: React.FC = () => {
               <p className="text-muted-foreground text-xs text-right">
                 [{payload.content.length}/50] 최대 50자까지 입력할 수 있습니다.
               </p>
-              <Button type="submit" className="w-full" disabled={disabled}>
+              <Button type="submit" className="w-full" disabled={loading}>
                 {loading && <Spinner />}
                 축하 메시지 남기기
               </Button>
@@ -188,7 +192,7 @@ export const MessageSection: React.FC = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => setDeleteMessageAction(message.id)}
-                        className="shrink-0"
+                        className={`shrink-0 ${IS_AFTER_WEDDING ? "" : "hidden"}`}
                       >
                         삭제
                       </Button>

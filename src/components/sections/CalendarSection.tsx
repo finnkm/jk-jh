@@ -1,11 +1,11 @@
 import React from "react";
-import { differenceInDays, startOfToday } from "date-fns";
+import { differenceInDays, startOfDay, startOfToday } from "date-fns";
 import { ko } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
 const FIXED_DATE = new Date(import.meta.env.VITE_WEDDING_DATE);
-const DAYS_LEFT = differenceInDays(FIXED_DATE, startOfToday());
+const DAYS_LEFT = differenceInDays(startOfDay(FIXED_DATE), startOfToday());
 
 export const CalendarSection: React.FC = () => {
   return (

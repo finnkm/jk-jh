@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { differenceInDays, startOfToday } from "date-fns";
+import { differenceInDays, startOfDay, startOfToday } from "date-fns";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +18,7 @@ import useDiscordWebhook from "@/hooks/useDiscordWebhook";
 import { usefirebaseStorage } from "@/hooks/usefirebaseStorage";
 
 const FIXED_DATE = new Date(import.meta.env.VITE_WEDDING_DATE);
-const DAYS_LEFT = differenceInDays(FIXED_DATE, startOfToday());
+const DAYS_LEFT = differenceInDays(startOfDay(FIXED_DATE), startOfToday());
 
 export const ImageUploadSection: React.FC = () => {
   const [isUploadingState, setIsUploadingState] = useState(false);
