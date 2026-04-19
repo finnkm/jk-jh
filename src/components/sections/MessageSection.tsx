@@ -20,7 +20,7 @@ import { useFirebaseDatabase } from "@/hooks/useFirebaseDatabase";
 
 const FIXED_DATE = new Date(import.meta.env.VITE_WEDDING_DATE);
 const DAYS_LEFT = differenceInDays(startOfDay(FIXED_DATE), startOfToday());
-const IS_AFTER_WEDDING = DAYS_LEFT < 0;
+const IS_WEDDING_OVER = DAYS_LEFT < 0;
 
 const preventSpaceInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.key === " ") {
@@ -101,13 +101,13 @@ export const MessageSection: React.FC = () => {
   return (
     <>
       <section className="w-full flex items-center justify-center bg-primary/5 flex-col gap-6 py-6 px-4">
-        <div className={`flex flex-col items-center gap-2 mb-2 ${IS_AFTER_WEDDING ? "" : "hidden"}`}>
+        <div className={`flex flex-col items-center gap-2 mb-2 ${IS_WEDDING_OVER ? "hidden" : ""}`}>
           <h2 className="font-default-bold text-xl">Message</h2>
         </div>
         <div className="w-full max-w-2xl">
           {/* 메시지 작성 폼 */}
           <div
-            className={`bg-white rounded-lg p-5 shadow-sm border border-gray-100 ${IS_AFTER_WEDDING ? "" : "hidden"}`}
+            className={`bg-white rounded-lg p-5 shadow-sm border border-gray-100 ${IS_WEDDING_OVER ? "hidden" : ""}`}
           >
             <p className="text-base font-medium text-gray-800 mb-4 text-center">축하 메시지를 남겨보세요.</p>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -192,7 +192,7 @@ export const MessageSection: React.FC = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => setDeleteMessageAction(message.id)}
-                        className={`shrink-0 ${IS_AFTER_WEDDING ? "" : "hidden"}`}
+                        className={`shrink-0 ${IS_WEDDING_OVER ? "hidden" : ""}`}
                       >
                         삭제
                       </Button>
